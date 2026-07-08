@@ -1,0 +1,143 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+import connectDB from './shared/config/database.js';
+import { validateEnv } from './shared/config/validation.js';
+import authRoutes from './superadmin/routes/authRoutes.js';
+import adminAuthRoutes from './admin/routes/authRoutes.js';
+import adminRoutes from './superadmin/routes/adminRoutes.js';
+import adminDashboardRoutes from './admin/routes/dashboardRoutes.js';
+import memberRoutes from './admin/routes/memberRoutes.js';
+import memberAuthRoutes from './member/routes/authRoutes.js';
+import User from './shared/models/User.js';
+
+dotenv.config();
+validateEnv();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(helmet());
+
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(morgan('combined'));
+
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many login attempts, please try again after 15 minutes.',
+  skipSuccessfulRequests: true,
+});
+
+const initializeSuperAdmin = async () => {
+  try {
+    const superAdminExists = await User.findOne({ email: process.env.SUPER_ADMIN_EMAIL });
+    if (!superAdminExists) {
+      const superAdmin = new User({
+        name: 'Super Admin',
+        email: process.env.SUPER_ADMIN_EMAIL,
+        password: process.env.SUPER_ADMIN_PASSWORD,
+        role: 'super_admin',
+        isActive: true,
+      });
+      await superAdmin.save();
+      console.log('✅ Super Admin created successfully');
+      console.log(`📧 Email: ${process.env.SUPER_ADMIN_EMAIL}`);
+    } else {
+      superAdminExists.password = process.env.SUPER_ADMIN_PASSWORD;
+      await superAdminExists.save();
+      console.log('✅ Super Admin already exists (password updated/synced with env)');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing super admin:', error.message);
+  }
+};
+
+app.use('/api/auth', loginLimiter, authRoutes);
+app.use('/api/admin', adminAuthRoutes);
+app.use('/api/admins', adminRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
+app.use('/api/admin/members', memberRoutes);
+app.use('/api/member/auth', memberAuthRoutes);
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    path: req.path,
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Error:', {
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    timestamp: new Date().toISOString(),
+  });
+
+  const statusCode = err.statusCode || 500;
+  const message = process.env.NODE_ENV === 'development' ? err.message : 'Internal server error';
+
+  res.status(statusCode).json({
+    success: false,
+    message,
+    ...(process.env.NODE_ENV === 'development' && { error: err.message }),
+  });
+});
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    await initializeSuperAdmin();
+    
+    const server = app.listen(PORT, () => {
+      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+      console.log(`📝 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🔒 Security: Helmet enabled, Rate limiting active\n`);
+    });
+
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+export default app;
