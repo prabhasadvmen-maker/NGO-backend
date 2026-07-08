@@ -1,13 +1,13 @@
-import User from '../../shared/models/User.js';
+import Member from '../../shared/models/Member.js';
 
 export const getDashboardStats = async (req, res) => {
   try {
     const [totalMembers, totalDonations, totalProjects, totalEvents, totalVolunteers, totalBeneficiaries] = await Promise.all([
-      User.countDocuments({ role: 'user' }),
+      Member.countDocuments({ createdBy: req.user.id }),
       Promise.resolve(0),
       Promise.resolve(0),
       Promise.resolve(0),
-      User.countDocuments({ role: 'volunteer', isActive: true }),
+      Promise.resolve(0),
       Promise.resolve(0),
     ]);
     res.status(200).json({
