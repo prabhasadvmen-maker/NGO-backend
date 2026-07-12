@@ -20,6 +20,8 @@ import memberMembershipRoutes from './member/routes/membershipRoutes.js';
 import superadminMemberRoutes from './superadmin/routes/memberRoutes.js';
 import superadminVolunteerRoutes from './superadmin/routes/volunteerRoutes.js';
 import superadminBeneficiaryRoutes from './superadmin/routes/beneficiaryRoutes.js';
+import superadminDonationRoutes from './superadmin/routes/donationRoutes.js';
+import adminDonationRoutes from './admin/routes/donationRoutes.js';
 import User from './shared/models/User.js';
 
 dotenv.config();
@@ -98,6 +100,8 @@ app.use('/api/admin/members', memberRoutes);
 app.use('/api/superadmin/members', superadminMemberRoutes);
 app.use('/api/superadmin/volunteers', superadminVolunteerRoutes);
 app.use('/api/superadmin/beneficiaries', superadminBeneficiaryRoutes);
+app.use('/api/superadmin/donations', superadminDonationRoutes);
+app.use('/api/admin/donations', adminDonationRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
 app.use('/api/member/membership', memberMembershipRoutes);
 

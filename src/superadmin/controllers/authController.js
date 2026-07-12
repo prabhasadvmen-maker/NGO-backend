@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../../shared/models/User.js';
+import Donation from '../../shared/models/Donation.js';
+import Volunteer from '../../shared/models/Volunteer.js';
+import NgoProfile from '../../shared/models/NgoProfile.js';
 
 export const getMe = async (req, res) => {
   try {
@@ -67,15 +70,29 @@ export const login = async (req, res) => {
 
 export const getDashboardStats = async (req, res) => {
   try {
-    const [totalUsers, activeVolunteers] = await Promise.all([
+    const [totalUsers, activeVolunteers, totalNGOs, donationStats] = await Promise.all([
       User.countDocuments(),
-      User.countDocuments({ role: 'volunteer', isActive: true }),
+      Volunteer.countDocuments({ status: 'Active' }),
+      NgoProfile.countDocuments(),
+      Donation.aggregate([
+        { $match: { paymentStatus: 'completed' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ])
     ]);
+    
+    const totalDonations = donationStats[0]?.total || 0;
+
     res.status(200).json({
       success: true,
-      data: { totalNGOs: 0, totalUsers, totalDonations: 0, activeVolunteers },
+      data: { 
+        totalNGOs, 
+        totalUsers, 
+        totalDonations, 
+        activeVolunteers 
+      },
     });
   } catch (error) {
+    console.error('Superadmin dashboard stats error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
