@@ -17,6 +17,8 @@ import adminDashboardRoutes from './admin/routes/dashboardRoutes.js';
 import memberRoutes from './admin/routes/memberRoutes.js';
 import memberAuthRoutes from './member/routes/authRoutes.js';
 import memberMembershipRoutes from './member/routes/membershipRoutes.js';
+import superadminMemberRoutes from './superadmin/routes/memberRoutes.js';
+import superadminVolunteerRoutes from './superadmin/routes/volunteerRoutes.js';
 import User from './shared/models/User.js';
 
 dotenv.config();
@@ -92,6 +94,8 @@ app.use('/api/superadmin/departments', departmentRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/members', memberRoutes);
+app.use('/api/superadmin/members', superadminMemberRoutes);
+app.use('/api/superadmin/volunteers', superadminVolunteerRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
 app.use('/api/member/membership', memberMembershipRoutes);
 
