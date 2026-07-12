@@ -1,26 +1,30 @@
 import jwt from 'jsonwebtoken';
 import Member from '../../shared/models/Member.js';
-import { getUploadPresignedUrl, getViewPresignedUrl, deleteObject } from '../../utils/r2.js';
+import MembershipType from '../../shared/models/MembershipType.js';
+import { uploadToR2, getViewPresignedUrl, deleteObject } from '../../utils/r2.js';
 import { v4 as uuidv4 } from 'uuid';
 
-// GET /api/admin/members/upload-url?fileName=x&contentType=image/jpeg
-export const getUploadUrl = async (req, res) => {
+// POST /api/admin/members/upload - Backend handles R2 upload
+export const uploadPhoto = async (req, res) => {
   try {
-    const { fileName, contentType } = req.query;
-    if (!fileName || !contentType) {
-      return res.status(400).json({ success: false, message: 'fileName and contentType are required' });
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file provided' });
     }
+
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(contentType)) {
+    if (!allowedTypes.includes(req.file.mimetype)) {
       return res.status(400).json({ success: false, message: 'Only JPEG, PNG, WEBP images are allowed' });
     }
-    const ext = fileName.split('.').pop();
+
+    const ext = req.file.originalname.split('.').pop();
     const key = `members/photos/${uuidv4()}.${ext}`;
-    const uploadUrl = await getUploadPresignedUrl(key, contentType, 300);
-    res.json({ success: true, uploadUrl, key });
+    
+    await uploadToR2(key, req.file.buffer, req.file.mimetype);
+    
+    res.json({ success: true, key, message: 'Photo uploaded successfully' });
   } catch (error) {
-    console.error('Upload URL error:', error);
-    res.status(500).json({ success: false, message: 'Failed to generate upload URL' });
+    console.error('Upload error:', error);
+    res.status(500).json({ success: false, message: 'Failed to upload photo' });
   }
 };
 
@@ -41,6 +45,21 @@ function sanitizeBody(body) {
 // POST /api/admin/members
 export const createMember = async (req, res) => {
   try {
+    const { membershipType } = req.body;
+
+    // Validate membershipType exists
+    if (membershipType) {
+      const typeExists = await MembershipType.findOne({ name: membershipType, isActive: true });
+      if (!typeExists) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid membership type: ${membershipType}`
+        });
+      }
+      // Auto-set membershipFee from MembershipType
+      req.body.membershipFee = typeExists.annualFee;
+    }
+
     const member = new Member({ ...sanitizeBody(req.body), createdBy: req.user.id });
     await member.save();
 
@@ -131,6 +150,21 @@ export const getMemberById = async (req, res) => {
 // PUT /api/admin/members/:id
 export const updateMember = async (req, res) => {
   try {
+    const { membershipType } = req.body;
+
+    // Validate membershipType exists if being changed
+    if (membershipType) {
+      const typeExists = await MembershipType.findOne({ name: membershipType, isActive: true });
+      if (!typeExists) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid membership type: ${membershipType}`
+        });
+      }
+      // Auto-set membershipFee from MembershipType
+      req.body.membershipFee = typeExists.annualFee;
+    }
+
     const existing = await Member.findOne({ _id: req.params.id, createdBy: req.user.id }).select('+password');
     if (!existing) return res.status(404).json({ success: false, message: 'Member not found' });
 

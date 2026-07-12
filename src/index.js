@@ -9,9 +9,14 @@ import { validateEnv } from './shared/config/validation.js';
 import authRoutes from './superadmin/routes/authRoutes.js';
 import adminAuthRoutes from './admin/routes/authRoutes.js';
 import adminRoutes from './superadmin/routes/adminRoutes.js';
+import membershipTypeRoutes from './superadmin/routes/membershipTypeRoutes.js';
+import ngoProfileRoutes from './superadmin/routes/ngoProfileRoutes.js';
+import branchRoutes from './superadmin/routes/branchRoutes.js';
+import departmentRoutes from './superadmin/routes/departmentRoutes.js';
 import adminDashboardRoutes from './admin/routes/dashboardRoutes.js';
 import memberRoutes from './admin/routes/memberRoutes.js';
 import memberAuthRoutes from './member/routes/authRoutes.js';
+import memberMembershipRoutes from './member/routes/membershipRoutes.js';
 import User from './shared/models/User.js';
 
 dotenv.config();
@@ -77,9 +82,18 @@ const initializeSuperAdmin = async () => {
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/superadmin/membership-types', membershipTypeRoutes);
+app.use('/api/membership-types', membershipTypeRoutes);
+app.use('/api/superadmin/ngo-profile', ngoProfileRoutes);
+app.use('/api/ngo-profile', ngoProfileRoutes);
+app.use('/api/superadmin/branches', branchRoutes);
+app.use('/api/branches', branchRoutes);
+app.use('/api/superadmin/departments', departmentRoutes);
+app.use('/api/departments', departmentRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/members', memberRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
+app.use('/api/member/membership', memberMembershipRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({

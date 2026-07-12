@@ -72,7 +72,6 @@ const memberSchema = new mongoose.Schema(
     },
     membershipType: {
       type: String,
-      enum: ['General', 'Life', 'Honorary', 'Student', 'Corporate'],
       default: 'General',
     },
     membershipFee: {
@@ -100,12 +99,17 @@ const memberSchema = new mongoose.Schema(
     },
     requestedMembershipType: {
       type: String,
-      enum: [null, 'General', 'Life', 'Honorary', 'Student', 'Corporate'],
       default: null,
     },
     requestStatus: {
       type: String,
       enum: [null, 'Pending', 'Approved', 'Rejected'],
+      default: null,
+    },
+    // Associated NGO branch
+    branch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
       default: null,
     },
     // Which admin org this member belongs to

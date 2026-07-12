@@ -9,8 +9,8 @@ const getR2Client = () => {
       region: 'auto',
       endpoint: process.env.R2_ENDPOINT,
       credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY,
-        secretAccessKey: process.env.R2_SECRET_KEY,
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
       },
     });
   }
@@ -18,10 +18,28 @@ const getR2Client = () => {
 };
 
 /**
+ * Upload a file directly to R2 (backend handles upload)
+ * @param {string} key - Object key (path in bucket)
+ * @param {Buffer} fileBuffer - File content as buffer
+ * @param {string} contentType - MIME type of the file
+ */
+export async function uploadToR2(key, fileBuffer, contentType) {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET;
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: fileBuffer,
+    ContentType: contentType,
+  });
+  await client.send(command);
+}
+
+/**
  * Generate a presigned URL for uploading a file to R2
  * @param {string} key - Object key (path in bucket)
  * @param {string} contentType - MIME type of the file
- * @param {number} expiresIn - Seconds until URL expires (default 5 min)
+ * @param {number} expiresIn - Seconds until URL expires (default 5 minutes)
  */
 export async function getUploadPresignedUrl(key, contentType, expiresIn = 300) {
   const client = getR2Client();
