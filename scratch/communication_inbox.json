@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1783959463494",
+    "type": "Email",
+    "subject": "gfnthfgnhfgt",
+    "message": "ethrtgfnhrthfb",
+    "recipientType": "Volunteers",
+    "recipients": [
+      {
+        "name": "Rahul Sharma",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "9876543210"
+      },
+      {
+        "name": "Anil kumar singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "9918309983"
+      }
+    ],
+    "sentAt": "2026-07-13T16:17:43.495Z",
+    "status": "Sent"
+  }
+]

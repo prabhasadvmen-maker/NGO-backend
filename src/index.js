@@ -34,6 +34,14 @@ import publicRoutes from './shared/routes/publicRoutes.js';
 import superadminExpenseRoutes from './superadmin/routes/expenseRoutes.js';
 import adminExpenseRoutes from './admin/routes/expenseRoutes.js';
 import reportsRoutes from './shared/routes/reportsRoutes.js';
+import superadminCmsRoutes from './superadmin/routes/cmsRoutes.js';
+import adminCmsRoutes from './admin/routes/cmsRoutes.js';
+import publicCmsRoutes from './shared/routes/publicCmsRoutes.js';
+import superadminMediaRoutes from './superadmin/routes/mediaRoutes.js';
+import adminMediaRoutes from './admin/routes/mediaRoutes.js';
+import superadminCommunicationRoutes from './superadmin/routes/communicationRoutes.js';
+import adminCommunicationRoutes from './admin/routes/communicationRoutes.js';
+import systemRoutes from './superadmin/routes/systemRoutes.js';
 import User from './shared/models/User.js';
 
 dotenv.config();
@@ -56,9 +64,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('combined'));
 
+const isDev = process.env.NODE_ENV === 'development';
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: isDev ? 10000 : (parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100),
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -126,6 +135,14 @@ app.use('/api/public', publicRoutes);
 app.use('/api/superadmin/expenses', superadminExpenseRoutes);
 app.use('/api/admin/expenses', adminExpenseRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/superadmin/cms', superadminCmsRoutes);
+app.use('/api/admin/cms', adminCmsRoutes);
+app.use('/api/public/cms', publicCmsRoutes);
+app.use('/api/superadmin/media', superadminMediaRoutes);
+app.use('/api/admin/media', adminMediaRoutes);
+app.use('/api/superadmin/communication', superadminCommunicationRoutes);
+app.use('/api/admin/communication', adminCommunicationRoutes);
+app.use('/api/superadmin/system', systemRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
 app.use('/api/member/membership', memberMembershipRoutes);
 
