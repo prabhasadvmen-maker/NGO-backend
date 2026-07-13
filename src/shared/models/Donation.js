@@ -65,6 +65,11 @@ const donationSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    campaign: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Campaign',
+      default: null,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
