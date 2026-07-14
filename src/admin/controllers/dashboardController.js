@@ -1,5 +1,9 @@
 import Member from '../../shared/models/Member.js';
 import Donation from '../../shared/models/Donation.js';
+import Beneficiary from '../../shared/models/Beneficiary.js';
+import Volunteer from '../../shared/models/Volunteer.js';
+import Project from '../../shared/models/Project.js';
+import Event from '../../shared/models/Event.js';
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -11,10 +15,10 @@ export const getDashboardStats = async (req, res) => {
 
     const [totalMembers, totalProjects, totalEvents, totalVolunteers, totalBeneficiaries] = await Promise.all([
       Member.countDocuments({ createdBy: req.user.id }),
-      Promise.resolve(0),
-      Promise.resolve(0),
-      Promise.resolve(0),
-      Promise.resolve(0),
+      Project.countDocuments({ createdBy: req.user.id }),
+      Event.countDocuments({ createdBy: req.user.id }),
+      Volunteer.countDocuments({ createdBy: req.user.id }),
+      Beneficiary.countDocuments({ createdBy: req.user.id }),
     ]);
 
     res.status(200).json({

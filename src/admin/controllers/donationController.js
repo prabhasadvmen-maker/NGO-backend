@@ -132,21 +132,18 @@ export const getDonationById = async (req, res) => {
 // POST /api/admin/donations
 export const createDonation = async (req, res) => {
   try {
-    const { donorName, amount, paymentMethod, branch } = req.body;
+    const { donorName, amount, paymentMethod } = req.body;
 
     if (!donorName || !amount || !paymentMethod) {
       return res.status(400).json({ success: false, message: 'Donor name, amount, and payment method are required' });
     }
 
-    if (branch) {
-      const branchExists = await Branch.findById(branch);
-      if (!branchExists) {
-        return res.status(400).json({ success: false, message: 'Invalid branch ID' });
-      }
-    }
+    const adminBranch = await Branch.findOne({ branchHead: req.user.id });
+    const branchId = adminBranch ? adminBranch._id : null;
 
     const donation = new Donation({
       ...sanitizeBody(req.body),
+      branch: branchId,
       createdBy: req.user.id
     });
 
@@ -170,17 +167,17 @@ export const createDonation = async (req, res) => {
 // PUT /api/admin/donations/:id
 export const updateDonation = async (req, res) => {
   try {
-    const { branch } = req.body;
-    if (branch) {
-      const branchExists = await Branch.findById(branch);
-      if (!branchExists) {
-        return res.status(400).json({ success: false, message: 'Invalid branch ID' });
-      }
+    const adminBranch = await Branch.findOne({ branchHead: req.user.id });
+    const branchId = adminBranch ? adminBranch._id : null;
+
+    const updateData = sanitizeBody(req.body);
+    if (branchId) {
+      updateData.branch = branchId;
     }
 
     const donation = await Donation.findOneAndUpdate(
       { _id: req.params.id, createdBy: req.user.id },
-      { $set: sanitizeBody(req.body) },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 

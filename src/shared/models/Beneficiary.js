@@ -83,8 +83,8 @@ const beneficiarySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Active', 'Inactive'],
-      default: 'Active',
+      enum: ['Active', 'Inactive', 'Pending'],
+      default: 'Pending',
     },
     registrationDate: {
       type: Date,
