@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import Groq from 'groq-sdk';
 import { verifyToken, verifySuperAdmin } from '../../shared/middleware/auth.js';
 import { logActivity } from '../../utils/auditLogger.js';
 
@@ -431,24 +432,27 @@ router.post('/config', verifyToken, verifySuperAdmin, async (req, res) => {
 // ----------------------------------------------------
 
 router.post('/ai', verifyToken, verifySuperAdmin, async (req, res) => {
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   try {
     const { prompt } = req.body;
     if (!prompt) {
       return res.status(400).json({ success: false, message: 'Prompt content is required' });
     }
 
-    const norm = prompt.toLowerCase();
-    let reply = '';
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a smart NGO operations assistant for Advmen NGO. Help with donation analysis, volunteer management, event planning, branch operations, and finance insights. Be concise and professional.'
+        },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 512,
+      temperature: 0.7
+    });
 
-    if (norm.includes('donation') || norm.includes('finance') || norm.includes('fund')) {
-      reply = "Based on our statistical NLP model: Lucknow Branch accounts for 68% of total micro-donations in Q2. Direct digital transfers are up by 24%. Recommended strategy: Focus marketing drives on mobile donation flows.";
-    } else if (norm.includes('event') || norm.includes('campaign') || norm.includes('workshop')) {
-      reply = "AI Insight: We recommend hosting a community health workshop in late August. Historical logs suggest Saturday afternoon events generate 35% higher attendance rates.";
-    } else if (norm.includes('volunteer') || norm.includes('member') || norm.includes('recruitment')) {
-      reply = "AI Analysis: Volunteer applications surged by 45% following the latest environmental drive. The system recommends sending automated gratitude push alerts to keep engagement high.";
-    } else {
-      reply = "Advmen NGO AI Model: Prompt processed successfully. Ready to compute target allocation metrics for operations, user profiles, or branch audits. Let me know if you want me to analyze finance trends or plan the next event.";
-    }
+    const reply = completion.choices[0]?.message?.content || 'No response generated.';
 
     await logActivity(req, 'ASK_AI_CENTER', 'SYSTEM', `Queried AI assistant with prompt: "${prompt.substring(0, 40)}..."`);
 
