@@ -62,9 +62,17 @@ export const getCmsConfig = async (req, res) => {
       await config.save();
     }
     
-    // Resolve hero image URL
     const configObj = config.toObject();
     configObj.heroImageUrl = await resolveImageUrl(configObj.heroImage);
+    
+    if (configObj.heroBannerImages && configObj.heroBannerImages.length > 0) {
+      configObj.heroBannerImages = await Promise.all(
+        configObj.heroBannerImages.map(async (img) => ({
+          ...img,
+          imageUrlResolved: await resolveImageUrl(img.imageUrl)
+        }))
+      );
+    }
     
     return res.status(200).json({ success: true, data: configObj });
   } catch (err) {
@@ -74,7 +82,7 @@ export const getCmsConfig = async (req, res) => {
 
 export const updateCmsConfig = async (req, res) => {
   try {
-    const { heroTitle, heroSubtitle, heroImage, mission, vision, stats } = req.body;
+    const { heroTitle, heroSubtitle, heroImage, heroBannerImages, mission, vision, stats } = req.body;
     let config = await CmsConfig.findOne();
     if (!config) {
       config = new CmsConfig();
@@ -83,6 +91,7 @@ export const updateCmsConfig = async (req, res) => {
     if (heroTitle !== undefined) config.heroTitle = heroTitle;
     if (heroSubtitle !== undefined) config.heroSubtitle = heroSubtitle;
     if (heroImage !== undefined) config.heroImage = heroImage;
+    if (heroBannerImages !== undefined) config.heroBannerImages = heroBannerImages;
     if (mission !== undefined) config.mission = mission;
     if (vision !== undefined) config.vision = vision;
     if (stats !== undefined) config.stats = stats;
@@ -92,6 +101,15 @@ export const updateCmsConfig = async (req, res) => {
     
     const configObj = config.toObject();
     configObj.heroImageUrl = await resolveImageUrl(configObj.heroImage);
+    
+    if (configObj.heroBannerImages && configObj.heroBannerImages.length > 0) {
+      configObj.heroBannerImages = await Promise.all(
+        configObj.heroBannerImages.map(async (img) => ({
+          ...img,
+          imageUrlResolved: await resolveImageUrl(img.imageUrl)
+        }))
+      );
+    }
     
     return res.status(200).json({ success: true, message: 'CMS Homepage Settings updated', data: configObj });
   } catch (err) {
@@ -128,7 +146,6 @@ export const getAllNewsPosts = async (req, res) => {
       NewsPost.countDocuments(filter)
     ]);
 
-    // Resolve cover image URLs
     const postsWithUrls = await Promise.all(
       posts.map(async (p) => {
         const obj = p.toObject();
@@ -243,7 +260,6 @@ export const getAllGalleryItems = async (req, res) => {
       GalleryItem.countDocuments(filter)
     ]);
 
-    // Resolve gallery image URLs
     const itemsWithUrls = await Promise.all(
       items.map(async (item) => {
         const obj = item.toObject();
@@ -341,7 +357,6 @@ export const getAllTestimonials = async (req, res) => {
       Testimonial.countDocuments(filter)
     ]);
 
-    // Resolve avatars URLs
     const testimonialsWithUrls = await Promise.all(
       testimonials.map(async (t) => {
         const obj = t.toObject();

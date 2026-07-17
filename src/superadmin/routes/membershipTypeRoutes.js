@@ -10,9 +10,9 @@ import {
 
 const router = express.Router();
 
-// Public read endpoints - accessible to both Super Admin and Admin
-router.get('/', verifyToken, getMembershipTypes);
-router.get('/:id', verifyToken, getMembershipTypeById);
+// Public read endpoints - accessible to both Super Admin, Admin and public visitors
+router.get('/', getMembershipTypes);
+router.get('/:id', getMembershipTypeById);
 
 // Protected write endpoints - only Super Admin
 router.post('/', verifyToken, verifySuperAdmin, createMembershipType);

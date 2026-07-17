@@ -4,7 +4,8 @@ import {
   getPublicNews,
   getPublicGallery,
   getPublicTestimonials,
-  submitContactQuery
+  submitContactQuery,
+  chatbotReply
 } from '../controllers/publicCmsController.js';
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.get('/news', getPublicNews);
 router.get('/gallery', getPublicGallery);
 router.get('/testimonials', getPublicTestimonials);
 router.post('/contact', submitContactQuery);
+router.post('/chatbot', chatbotReply);
 
 export default router;

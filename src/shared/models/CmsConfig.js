@@ -16,6 +16,13 @@ const cmsConfigSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    heroBannerImages: [
+      {
+        imageUrl: String,
+        caption: String,
+        order: Number,
+      },
+    ],
     newsCoverImage: {
       type: String,
       default: '',
@@ -52,6 +59,14 @@ const cmsConfigSchema = new mongoose.Schema(
         default: 0,
       },
     },
+    contactPhone: {
+      type: String,
+      default: '+91 83750 08009',
+    },
+    contactEmail: {
+      type: String,
+      default: 'hello@advmen.com',
+    },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -60,6 +75,14 @@ const cmsConfigSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Auto-sort heroBannerImages by order field
+cmsConfigSchema.pre('save', function (next) {
+  if (this.heroBannerImages && this.heroBannerImages.length > 0) {
+    this.heroBannerImages.sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+  next();
+});
 
 const CmsConfig = mongoose.model('CmsConfig', cmsConfigSchema);
 export default CmsConfig;
