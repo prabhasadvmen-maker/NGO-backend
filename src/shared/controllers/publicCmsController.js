@@ -168,10 +168,16 @@ export const chatbotReply = async (req, res) => {
     }
 
     if (!process.env.GROQ_API_KEY) {
+      console.error('GROQ_API_KEY not configured');
       return res.status(503).json({ success: false, message: 'Chatbot service unavailable. Contact +91 83750 08009.' });
     }
 
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    console.log('Groq API Key present:', process.env.GROQ_API_KEY.substring(0, 10) + '...');
+
+    const groq = new Groq({ 
+      apiKey: process.env.GROQ_API_KEY,
+      timeout: 30000
+    });
 
     let config = await CmsConfig.findOne();
     if (!config) {
@@ -189,17 +195,47 @@ export const chatbotReply = async (req, res) => {
       { role: 'user', content: message.trim() }
     ];
 
-    const completion = await groq.chat.completions.create({
-      model: 'llama3-8b-8192',
-      messages,
-      max_tokens: 200,
-      temperature: 0.6
+    console.log('Sending to Groq API:', { 
+      model: 'llama-3.3-70b-versatile', 
+      messageCount: messages.length,
+      userMessage: message.substring(0, 50) + '...'
     });
 
+    let completion;
+    try {
+      completion = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        max_tokens: 200,
+        temperature: 0.6
+      });
+    } catch (groqErr) {
+      console.error('Groq API Error Details:', {
+        message: groqErr.message,
+        status: groqErr.status,
+        statusCode: groqErr.statusCode,
+        type: groqErr.type,
+        fullError: JSON.stringify(groqErr)
+      });
+      throw groqErr;
+    }
+
+    if (!completion || !completion.choices || !completion.choices[0]) {
+      console.error('Invalid Groq response structure:', JSON.stringify(completion));
+      return res.status(500).json({ success: false, message: 'Chatbot service error. Please try again.' });
+    }
+
     const reply = completion.choices[0]?.message?.content?.trim() || `I am unable to respond right now. Please contact us at ${contactPhone}.`;
+    console.log('Chatbot response generated successfully');
     return res.status(200).json({ success: true, data: { reply } });
   } catch (err) {
-    console.error('Chatbot error:', err.message);
+    console.error('Chatbot error:', {
+      message: err.message,
+      status: err.status,
+      statusCode: err.statusCode,
+      type: err.type,
+      stack: err.stack
+    });
     return res.status(500).json({ success: false, message: 'Chatbot unavailable. Please try again later.' });
   }
 };
