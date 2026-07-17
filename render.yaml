@@ -1,6 +1,6 @@
-services:
+﻿services:
   - type: web
-    name: advmen-ngo-backend
+    name: savitram-ngo-backend
     runtime: node
     plan: free
     buildCommand: npm install

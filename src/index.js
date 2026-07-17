@@ -17,6 +17,7 @@ import adminDashboardRoutes from './admin/routes/dashboardRoutes.js';
 import memberRoutes from './admin/routes/memberRoutes.js';
 import memberAuthRoutes from './member/routes/authRoutes.js';
 import memberMembershipRoutes from './member/routes/membershipRoutes.js';
+import memberActivityRoutes from './member/routes/activityRoutes.js';
 import superadminMemberRoutes from './superadmin/routes/memberRoutes.js';
 import superadminVolunteerRoutes from './superadmin/routes/volunteerRoutes.js';
 import adminVolunteerRoutes from './admin/routes/volunteerRoutes.js';
@@ -151,6 +152,7 @@ app.use('/api/admin/communication', adminCommunicationRoutes);
 app.use('/api/superadmin/system', systemRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
 app.use('/api/member/membership', memberMembershipRoutes);
+app.use('/api/member/activities', memberActivityRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({

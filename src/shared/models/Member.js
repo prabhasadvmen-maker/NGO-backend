@@ -106,6 +106,18 @@ const memberSchema = new mongoose.Schema(
       enum: [null, 'Pending', 'Approved', 'Rejected'],
       default: null,
     },
+    upgradePaymentMode: {
+      type: String,
+      default: null,
+    },
+    upgradeTransactionId: {
+      type: String,
+      default: null,
+    },
+    upgradePaymentReceipt: {
+      type: String,
+      default: null,
+    },
     // Associated NGO branch
     branch: {
       type: mongoose.Schema.Types.ObjectId,
@@ -122,6 +134,17 @@ const memberSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    joinedProjects: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      default: []
+    }],
+    notificationPreferences: {
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: true },
+      events: { type: Boolean, default: true },
+      donations: { type: Boolean, default: true }
+    }
   },
   { timestamps: true }
 );

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import crypto from 'crypto';
 
 const certificateSchema = new mongoose.Schema(
@@ -45,7 +45,7 @@ const certificateSchema = new mongoose.Schema(
     },
     signatoryName: {
       type: String,
-      default: 'Advmen NGO Board',
+      default: 'Savitram Foundation Board',
       trim: true,
     },
     signatoryTitle: {

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "1783959463494",
     "type": "Email",
@@ -8,12 +8,12 @@
     "recipients": [
       {
         "name": "Rahul Sharma",
-        "email": "prabhas.advmen@gmail.com",
+        "email": "prabhas.savitram@gmail.com",
         "mobile": "9876543210"
       },
       {
         "name": "Anil kumar singh",
-        "email": "prabhas.advmen@gmail.com",
+        "email": "prabhas.savitram@gmail.com",
         "mobile": "9918309983"
       }
     ],

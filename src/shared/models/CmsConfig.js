@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 
 const cmsConfigSchema = new mongoose.Schema(
   {
     heroTitle: {
       type: String,
-      default: 'Advmen NGO',
+      default: 'SAVITRAM FOUNDATION',
       trim: true,
     },
     heroSubtitle: {

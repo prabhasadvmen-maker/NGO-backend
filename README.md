@@ -1,4 +1,4 @@
-# Advmen NGO Management System - Backend
+﻿# SAVITRAM FOUNDATION Management System - Backend
 
 Node.js + Express + MongoDB backend for Super Admin Portal
 
@@ -35,7 +35,7 @@ Server will start on `http://localhost:5000`
 
 ## 🔐 Super Admin Credentials
 
-**Email**: `admin@advmen.org`
+**Email**: `admin@savitram.org`
 **Password**: `Admin@123456`
 
 These are set in `.env` file and super admin is created automatically on first server start.
@@ -57,8 +57,8 @@ These are set in `.env` file and super admin is created automatically on first s
 ```
 PORT=5000
 MONGODB_URL=<your-mongodb-url>
-JWT_SECRET=advmen_ngo_super_secret_key_2024_production_level_security
-SUPER_ADMIN_EMAIL=admin@advmen.org
+JWT_SECRET=savitram_ngo_super_secret_key_2024_production_level_security
+SUPER_ADMIN_EMAIL=admin@savitram.org
 SUPER_ADMIN_PASSWORD=Admin@123456
 NODE_ENV=development
 CORS_ORIGIN=http://localhost:5173
@@ -79,7 +79,7 @@ CORS_ORIGIN=http://localhost:5173
 ### Login Request
 ```json
 {
-  "email": "admin@advmen.org",
+  "email": "admin@savitram.org",
   "password": "Admin@123456"
 }
 ```
@@ -93,7 +93,7 @@ CORS_ORIGIN=http://localhost:5173
   "user": {
     "id": "user_id",
     "name": "Super Admin",
-    "email": "admin@advmen.org",
+    "email": "admin@savitram.org",
     "role": "super_admin"
   }
 }
@@ -154,8 +154,8 @@ PORT=5001
 
 ## 📞 Support
 
-For issues or questions, contact: admin@advmen.org
+For issues or questions, contact: admin@savitram.org
 
 ---
 
-**Built with ❤️ for Advmen NGO**
+**Built with ❤️ for SAVITRAM FOUNDATION**

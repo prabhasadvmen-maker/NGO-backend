@@ -22,6 +22,11 @@ export const getMemberMembership = async (req, res) => {
     // Get photo URL
     const photoUrl = member.profilePhoto ? await getViewPresignedUrl(member.profilePhoto) : null;
 
+    let upgradeReceiptUrl = null;
+    if (member.upgradePaymentReceipt) {
+      upgradeReceiptUrl = await getViewPresignedUrl(member.upgradePaymentReceipt).catch(() => null);
+    }
+
     res.json({
       success: true,
       data: {
@@ -46,6 +51,9 @@ export const getMemberMembership = async (req, res) => {
         status: member.status,
         joiningDate: member.joiningDate,
         expiryDate: member.expiryDate,
+        upgradePaymentMode: member.upgradePaymentMode,
+        upgradeTransactionId: member.upgradeTransactionId,
+        upgradeReceiptUrl,
       }
     });
   } catch (error) {
@@ -57,10 +65,13 @@ export const getMemberMembership = async (req, res) => {
 // POST /api/member/membership/request-upgrade
 export const requestMembershipUpgrade = async (req, res) => {
   try {
-    const { requestedType } = req.body;
+    const { requestedType, paymentMode, transactionId, paymentReceipt } = req.body;
 
     if (!requestedType) {
       return res.status(400).json({ success: false, message: 'Requested membership type is required' });
+    }
+    if (!paymentMode || !transactionId) {
+      return res.status(400).json({ success: false, message: 'Payment mode and reference transaction ID are required' });
     }
 
     // Validate requested type exists
@@ -93,6 +104,9 @@ export const requestMembershipUpgrade = async (req, res) => {
     // Update member with upgrade request
     member.requestedMembershipType = requestedType;
     member.requestStatus = 'Pending';
+    member.upgradePaymentMode = paymentMode;
+    member.upgradeTransactionId = transactionId;
+    member.upgradePaymentReceipt = paymentReceipt || null;
     await member.save();
 
     res.json({

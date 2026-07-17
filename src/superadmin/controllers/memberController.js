@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import Member from '../../shared/models/Member.js';
 import MembershipType from '../../shared/models/MembershipType.js';
 import Branch from '../../shared/models/Branch.js';
+import Donation from '../../shared/models/Donation.js';
 import { getViewPresignedUrl, deleteObject } from '../../utils/r2.js';
 
 // Sanitize empty strings to null for optional fields
@@ -28,17 +29,37 @@ export const getMembers = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const filter = {};
-    if (status) filter.status = status;
+    if (status) {
+      if (status === 'Pending') {
+        filter.$or = [
+          { status: 'Pending' },
+          { requestStatus: 'Pending' }
+        ];
+      } else {
+        filter.status = status;
+      }
+    }
     if (membershipType) filter.membershipType = membershipType;
     if (branch) filter.branch = branch;
 
     if (search) {
-      filter.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { mobileNumber: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { memberId: { $regex: search, $options: 'i' } },
-      ];
+      const searchFilter = {
+        $or: [
+          { fullName: { $regex: search, $options: 'i' } },
+          { mobileNumber: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { memberId: { $regex: search, $options: 'i' } },
+        ]
+      };
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          searchFilter
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = searchFilter.$or;
+      }
     }
 
     const [members, total] = await Promise.all([
@@ -183,6 +204,41 @@ export const updateMember = async (req, res) => {
     // If password provided, update it. If empty string/null, delete to prevent overriding with blank string
     if (!sanitized.password) {
       delete sanitized.password;
+    }
+
+    // If requestStatus is being updated to Approved, check if it's an upgrade
+    if (sanitized.requestStatus === 'Approved' && member.requestedMembershipType) {
+      const plan = await MembershipType.findOne({ name: member.requestedMembershipType });
+      const feeAmount = plan?.annualFee || member.membershipFee || 0;
+
+      const paymentMethod = member.upgradePaymentMode === 'UPI' ? 'online' : (member.upgradePaymentMode === 'Bank Transfer' ? 'bank_transfer' : 'cash');
+      const donation = new Donation({
+        donorName: member.fullName,
+        donorEmail: member.email,
+        donorPhone: member.mobileNumber,
+        amount: feeAmount,
+        paymentMethod: paymentMethod,
+        paymentStatus: 'completed',
+        transactionId: member.upgradeTransactionId || `MEM-UPG-${Date.now()}`,
+        purpose: `Membership Upgrade: ${member.requestedMembershipType}`,
+        branch: member.branch,
+        createdBy: req.user.id
+      });
+      await donation.save();
+
+      member.membershipType = member.requestedMembershipType;
+      member.membershipFee = feeAmount;
+      member.requestedMembershipType = null;
+      member.upgradePaymentMode = null;
+      member.upgradeTransactionId = null;
+      member.upgradePaymentReceipt = null;
+      
+      delete sanitized.membershipType;
+      delete sanitized.membershipFee;
+      delete sanitized.requestedMembershipType;
+      delete sanitized.upgradePaymentMode;
+      delete sanitized.upgradeTransactionId;
+      delete sanitized.upgradePaymentReceipt;
     }
 
     Object.assign(member, sanitized);

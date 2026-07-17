@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import Member from '../../shared/models/Member.js';
 import MembershipType from '../../shared/models/MembershipType.js';
+import Donation from '../../shared/models/Donation.js';
 import { uploadToR2, getViewPresignedUrl, deleteObject } from '../../utils/r2.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -94,15 +95,35 @@ export const getMembers = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const filter = { createdBy: req.user.id };
-    if (status) filter.status = status;
+    if (status) {
+      if (status === 'Pending') {
+        filter.$or = [
+          { status: 'Pending' },
+          { requestStatus: 'Pending' }
+        ];
+      } else {
+        filter.status = status;
+      }
+    }
     if (membershipType) filter.membershipType = membershipType;
     if (search) {
-      filter.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { mobileNumber: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { memberId: { $regex: search, $options: 'i' } },
-      ];
+      const searchFilter = {
+        $or: [
+          { fullName: { $regex: search, $options: 'i' } },
+          { mobileNumber: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { memberId: { $regex: search, $options: 'i' } },
+        ]
+      };
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          searchFilter
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = searchFilter.$or;
+      }
     }
 
     const [members, total] = await Promise.all([
@@ -254,8 +275,30 @@ export const approveMembershipRequest = async (req, res) => {
     member.requestStatus = 'Approved';
     member.status = 'Active';
     if (member.requestedMembershipType) {
+      const plan = await MembershipType.findOne({ name: member.requestedMembershipType });
+      const feeAmount = plan?.annualFee || member.membershipFee || 0;
+
+      const paymentMethod = member.upgradePaymentMode === 'UPI' ? 'online' : (member.upgradePaymentMode === 'Bank Transfer' ? 'bank_transfer' : 'cash');
+      const donation = new Donation({
+        donorName: member.fullName,
+        donorEmail: member.email,
+        donorPhone: member.mobileNumber,
+        amount: feeAmount,
+        paymentMethod: paymentMethod,
+        paymentStatus: 'completed',
+        transactionId: member.upgradeTransactionId || `MEM-UPG-${Date.now()}`,
+        purpose: `Membership Upgrade: ${member.requestedMembershipType}`,
+        branch: member.branch,
+        createdBy: req.user.id
+      });
+      await donation.save();
+
       member.membershipType = member.requestedMembershipType;
+      member.membershipFee = feeAmount;
       member.requestedMembershipType = null;
+      member.upgradePaymentMode = null;
+      member.upgradeTransactionId = null;
+      member.upgradePaymentReceipt = null;
     }
     await member.save();
 

@@ -1,4 +1,4 @@
-import Certificate from '../models/Certificate.js';
+﻿import Certificate from '../models/Certificate.js';
 
 // GET /api/public/verify-certificate/:certId
 export const verifyCertificate = async (req, res) => {
@@ -37,7 +37,7 @@ export const verifyCertificate = async (req, res) => {
         signatoryName: certificate.signatoryName,
         signatoryTitle: certificate.signatoryTitle,
         hash: certificate.hash,
-        issuedBy: certificate.createdBy?.name || 'Advmen NGO Office'
+        issuedBy: certificate.createdBy?.name || 'SAVITRAM FOUNDATION Office'
       }
     });
   } catch (error) {

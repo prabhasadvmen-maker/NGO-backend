@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -169,7 +169,7 @@ router.post('/backup', verifyToken, verifySuperAdmin, async (req, res) => {
 
     const backupPayload = {
       metadata: {
-        ngoName: 'Advmen NGO',
+        ngoName: 'SAVITRAM FOUNDATION',
         version: '1.0.0',
         createdAt: new Date().toISOString()
       },
@@ -320,7 +320,7 @@ router.post('/api-keys', verifyToken, verifySuperAdmin, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Client name is required' });
     }
 
-    const token = `advmen_live_${crypto.randomBytes(24).toString('hex')}`;
+    const token = `savitram_live_${crypto.randomBytes(24).toString('hex')}`;
     const keyPrefix = token.substring(0, 16);
     const hashedKey = crypto.createHash('sha256').update(token).digest('hex');
 
@@ -375,7 +375,7 @@ router.get('/config', verifyToken, verifySuperAdmin, async (req, res) => {
     let config = await SystemConfig.findOne({});
     if (!config) {
       config = await SystemConfig.create({
-        webhookUrl: 'https://api.advmen.org/v1/webhook-receiver',
+        webhookUrl: 'https://api.savitram.org/v1/webhook-receiver',
         webhookEvents: ['member.created', 'donation.received'],
         r2AccessKey: 'r2_access_key_placeholder',
         r2SecretKey: 'r2_secret_key_placeholder',
@@ -444,7 +444,7 @@ router.post('/ai', verifyToken, verifySuperAdmin, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a smart NGO operations assistant for Advmen NGO. Help with donation analysis, volunteer management, event planning, branch operations, and finance insights. Be concise and professional.'
+          content: 'You are a smart NGO operations assistant for SAVITRAM FOUNDATION. Help with donation analysis, volunteer management, event planning, branch operations, and finance insights. Be concise and professional.'
         },
         { role: 'user', content: prompt }
       ],
