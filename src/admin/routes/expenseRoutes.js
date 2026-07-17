@@ -6,7 +6,8 @@ import {
   getExpenseById,
   createExpense,
   updateExpense,
-  deleteExpense
+  deleteExpense,
+  updateExpenseStatus
 } from '../controllers/expenseController.js';
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get('/:id', verifyToken, verifyAdmin, getExpenseById);
 router.post('/', verifyToken, verifyAdmin, createExpense);
 router.put('/:id', verifyToken, verifyAdmin, updateExpense);
 router.delete('/:id', verifyToken, verifyAdmin, deleteExpense);
+router.patch('/:id/status', verifyToken, verifyAdmin, updateExpenseStatus);
 
 export default router;

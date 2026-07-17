@@ -114,3 +114,70 @@ export const createCertificate = async (req, res) => {
     res.status(500).json({ success: false, message: error.message || 'Failed to issue certificate' });
   }
 };
+
+// DELETE /api/admin/certificates/:id
+export const deleteCertificate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const certificate = await Certificate.findOneAndDelete({ _id: id, createdBy: req.user.id });
+
+    if (!certificate) {
+      return res.status(404).json({ success: false, message: 'Certificate not found or unauthorized' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Certificate deleted successfully'
+    });
+  } catch (error) {
+    console.error('Admin delete certificate error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete certificate' });
+  }
+};
+
+// PUT /api/admin/certificates/:id
+export const updateCertificate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      recipientName, 
+      recipientEmail, 
+      role, 
+      type, 
+      title, 
+      description, 
+      signatoryName, 
+      signatoryTitle 
+    } = req.body;
+
+    const certificate = await Certificate.findOneAndUpdate(
+      { _id: id, createdBy: req.user.id },
+      { 
+        $set: { 
+          recipientName,
+          recipientEmail,
+          role,
+          type,
+          title, 
+          description, 
+          signatoryName, 
+          signatoryTitle 
+        } 
+      },
+      { new: true }
+    );
+
+    if (!certificate) {
+      return res.status(404).json({ success: false, message: 'Certificate not found or unauthorized' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Certificate updated successfully',
+      data: certificate
+    });
+  } catch (error) {
+    console.error('Admin update certificate error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update certificate' });
+  }
+};

@@ -1,5 +1,6 @@
 import Donation from '../../shared/models/Donation.js';
 import Branch from '../../shared/models/Branch.js';
+import mongoose from 'mongoose';
 
 // Sanitize optional fields to null
 function sanitizeBody(body) {
@@ -92,7 +93,7 @@ export const getDonationStats = async (req, res) => {
 
     // Aggregate total amount
     const amountStats = await Donation.aggregate([
-      { $match: { createdBy: req.user.id, paymentStatus: 'completed' } },
+      { $match: { createdBy: new mongoose.Types.ObjectId(req.user.id), paymentStatus: 'completed' } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     const totalAmount = amountStats[0]?.total || 0;

@@ -4,7 +4,8 @@ import {
   memberRegister,
   memberLogin,
   memberGetMe,
-  getMemberUploadUrl
+  getMemberUploadUrl,
+  memberUpdateProfile
 } from '../controllers/authController.js';
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/upload-url', getMemberUploadUrl);
 
 // Protected routes (requires valid member token)
 router.get('/me', verifyToken, verifyMember, memberGetMe);
+router.put('/me', verifyToken, verifyMember, memberUpdateProfile);
 
 export default router;

@@ -4,6 +4,7 @@ import Member from '../models/Member.js';
 import Volunteer from '../models/Volunteer.js';
 import Project from '../models/Project.js';
 import Branch from '../models/Branch.js';
+import mongoose from 'mongoose';
 
 // GET superadmin full audit reports and trends
 export const getSuperAdminReports = async (req, res) => {
@@ -11,7 +12,7 @@ export const getSuperAdminReports = async (req, res) => {
     const { branchId, startDate, endDate } = req.query;
 
     const queryFilter = {};
-    if (branchId) queryFilter.branch = branchId;
+    if (branchId) queryFilter.branch = new mongoose.Types.ObjectId(branchId);
 
     if (startDate || endDate) {
       queryFilter.createdAt = {};
@@ -204,7 +205,7 @@ export const getSuperAdminReports = async (req, res) => {
 // GET branch admin specific stats and logs
 export const getAdminReports = async (req, res) => {
   try {
-    const creatorFilter = { createdBy: req.user.id };
+    const creatorFilter = { createdBy: new mongoose.Types.ObjectId(req.user.id) };
 
     // 1. Core Summary Metrics
     const [totalDonationsAgg, totalExpensesAgg, membersCount, volunteersCount, projectsCount] = await Promise.all([

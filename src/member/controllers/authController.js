@@ -205,3 +205,61 @@ export const memberGetMe = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+// PUT /api/member/auth/me (Protected: Member role)
+export const memberUpdateProfile = async (req, res) => {
+  try {
+    const member = await Member.findById(req.user.id);
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Member not found' });
+    }
+
+    const allowedFields = [
+      'fullName', 'mobileNumber', 'dateOfBirth', 'gender',
+      'address', 'state', 'district', 'pinCode', 'occupation'
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        member[field] = req.body[field];
+      }
+    });
+
+    await member.save();
+
+    let photoUrl = null;
+    if (member.profilePhoto) {
+      photoUrl = await getViewPresignedUrl(member.profilePhoto);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        id: member._id,
+        memberId: member.memberId,
+        fullName: member.fullName,
+        email: member.email,
+        mobileNumber: member.mobileNumber,
+        dateOfBirth: member.dateOfBirth,
+        gender: member.gender,
+        address: member.address,
+        state: member.state,
+        district: member.district,
+        pinCode: member.pinCode,
+        occupation: member.occupation,
+        membershipType: member.membershipType,
+        membershipFee: member.membershipFee,
+        joiningDate: member.joiningDate,
+        expiryDate: member.expiryDate,
+        referredBy: member.referredBy,
+        status: member.status,
+        photoUrl,
+        role: 'member'
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

@@ -1,6 +1,7 @@
 import Expense from '../../shared/models/Expense.js';
 import Project from '../../shared/models/Project.js';
 import Branch from '../../shared/models/Branch.js';
+import mongoose from 'mongoose';
 
 // GET branch expenses (created by this admin)
 export const getAllExpenses = async (req, res) => {
@@ -80,14 +81,14 @@ export const getExpenseStats = async (req, res) => {
 
     // Aggregate total approved amount
     const amountStats = await Expense.aggregate([
-      { $match: { createdBy: req.user.id, paymentStatus: 'approved' } },
+      { $match: { createdBy: new mongoose.Types.ObjectId(req.user.id), paymentStatus: 'approved' } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     const totalAmount = amountStats[0]?.total || 0;
 
     // Aggregate by category
     const categoryStats = await Expense.aggregate([
-      { $match: { createdBy: req.user.id, paymentStatus: 'approved' } },
+      { $match: { createdBy: new mongoose.Types.ObjectId(req.user.id), paymentStatus: 'approved' } },
       { $group: { _id: '$category', total: { $sum: '$amount' }, count: { $sum: 1 } } }
     ]);
 
@@ -231,5 +232,53 @@ export const deleteExpense = async (req, res) => {
   } catch (error) {
     console.error('Admin delete expense error:', error);
     res.status(500).json({ success: false, message: 'Failed to delete expense request' });
+  }
+};
+
+// PATCH /api/admin/expenses/:id/status
+export const updateExpenseStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentStatus } = req.body; // 'approved' or 'rejected'
+
+    if (!['pending', 'approved', 'rejected'].includes(paymentStatus)) {
+      return res.status(400).json({ success: false, message: 'Invalid payment status' });
+    }
+
+    const oldExpense = await Expense.findById(id);
+    if (!oldExpense) {
+      return res.status(404).json({ success: false, message: 'Expense record not found' });
+    }
+
+    const updatedData = { paymentStatus };
+    if (paymentStatus === 'approved' && oldExpense.paymentStatus !== 'approved') {
+      updatedData.approvedBy = req.user.id;
+    } else if (paymentStatus === 'pending' || paymentStatus === 'rejected') {
+      updatedData.approvedBy = null;
+    }
+
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      id,
+      { $set: updatedData },
+      { new: true }
+    );
+
+    // Sync project expenses budget updates
+    const oldAmt = oldExpense.paymentStatus === 'approved' ? oldExpense.amount : 0;
+    const newAmt = updatedExpense.paymentStatus === 'approved' ? updatedExpense.amount : 0;
+    const projId = oldExpense.project;
+
+    if (projId && (newAmt - oldAmt !== 0)) {
+      await Project.findByIdAndUpdate(projId, { $inc: { expenses: newAmt - oldAmt } });
+    }
+
+    res.json({
+      success: true,
+      message: `Expense request ${paymentStatus} successfully`,
+      data: updatedExpense
+    });
+  } catch (error) {
+    console.error('Admin update expense status error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update expense status' });
   }
 };
