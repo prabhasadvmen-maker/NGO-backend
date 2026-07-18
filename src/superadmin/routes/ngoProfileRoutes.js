@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-// Read endpoint - accessible to authenticated Super Admin & Admin
-router.get('/', verifyToken, getNgoProfile);
+// Read endpoint - accessible to public
+router.get('/', getNgoProfile);
 
 // Write endpoints - Super Admin only
 router.put('/', verifyToken, verifySuperAdmin, updateNgoProfile);
