@@ -111,7 +111,8 @@ beneficiarySchema.pre('save', async function (next) {
   if (!this.beneficiaryId) {
     try {
       const count = await mongoose.model('Beneficiary').countDocuments();
-      this.beneficiaryId = `BEN${String(count + 1).padStart(5, '0')}`;
+      const random = Math.floor(100 + Math.random() * 900); // 3-digit random component to avoid concurrency collisions
+      this.beneficiaryId = `BEN${String(count + 1).padStart(4, '0')}${random}`;
     } catch (err) {
       return next(err);
     }

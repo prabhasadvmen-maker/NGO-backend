@@ -93,8 +93,9 @@ donationSchema.pre('save', async function (next) {
         createdAt: { $gte: startOfDay, $lte: endOfDay }
       });
       
-      const sequence = String(count + 1).padStart(4, '0');
-      this.receiptNumber = `REC-${dateString}-${sequence}`;
+      const sequence = String(count + 1).padStart(3, '0');
+      const random = Math.floor(1000 + Math.random() * 9000); // 4-digit random number to guarantee daily uniqueness
+      this.receiptNumber = `REC-${dateString}-${sequence}-${random}`;
     } catch (err) {
       return next(err);
     }

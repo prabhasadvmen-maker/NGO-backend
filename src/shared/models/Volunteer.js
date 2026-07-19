@@ -107,7 +107,8 @@ volunteerSchema.pre('save', async function (next) {
   if (!this.volunteerId) {
     try {
       const count = await mongoose.model('Volunteer').countDocuments();
-      this.volunteerId = `VOL${String(count + 1).padStart(5, '0')}`;
+      const random = Math.floor(100 + Math.random() * 900); // 3-digit random component to avoid concurrency collisions
+      this.volunteerId = `VOL${String(count + 1).padStart(4, '0')}${random}`;
     } catch (err) {
       return next(err);
     }

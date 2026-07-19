@@ -156,8 +156,13 @@ memberSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
   }
   if (!this.memberId) {
-    const count = await mongoose.model('Member').countDocuments();
-    this.memberId = `MEM${String(count + 1).padStart(5, '0')}`;
+    try {
+      const count = await mongoose.model('Member').countDocuments();
+      const random = Math.floor(100 + Math.random() * 900); // 3-digit random component to avoid concurrency collisions
+      this.memberId = `MEM${String(count + 1).padStart(4, '0')}${random}`;
+    } catch (err) {
+      return next(err);
+    }
   }
   next();
 });

@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import crypto from 'crypto';
 
 const certificateSchema = new mongoose.Schema(
@@ -77,8 +77,9 @@ certificateSchema.pre('save', async function (next) {
     try {
       const year = new Date().getFullYear();
       const count = await mongoose.model('Certificate').countDocuments();
-      const sequence = String(count + 1).padStart(5, '0');
-      this.certificateId = `CERT-${year}-${sequence}`;
+      const sequence = String(count + 1).padStart(4, '0');
+      const random = Math.floor(100 + Math.random() * 900); // 3-digit random component to avoid collisions
+      this.certificateId = `CERT-${year}-${sequence}-${random}`;
     } catch (err) {
       return next(err);
     }

@@ -1,4 +1,4 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 const cmsConfigSchema = new mongoose.Schema(
   {
@@ -61,7 +61,7 @@ const cmsConfigSchema = new mongoose.Schema(
     },
     contactPhone: {
       type: String,
-      default: '+91 83750 08009',
+      default: '+91 88600 36008',
     },
     contactEmail: {
       type: String,

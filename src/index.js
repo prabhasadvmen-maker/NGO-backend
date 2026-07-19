@@ -50,6 +50,7 @@ import adminCommunicationRoutes from './admin/routes/communicationRoutes.js';
 import systemRoutes from './superadmin/routes/systemRoutes.js';
 import User from './shared/models/User.js';
 import Event from './shared/models/Event.js';
+import NgoProfile from './shared/models/NgoProfile.js';
 
 dotenv.config();
 validateEnv();
@@ -188,6 +189,36 @@ const initializeEvents = async () => {
   }
 };
 
+const initializeNgoProfile = async () => {
+  try {
+    let profile = await NgoProfile.findOne();
+    if (!profile) {
+      profile = new NgoProfile({
+        name: 'SAVITRAM FOUNDATION',
+        contactNumber: '8860036008',
+        email: 'info@savitramfoundation.org',
+        address: 'A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida, Noida, Gautam Buddha Nagar - 201301, Uttar Pradesh',
+        city: 'Noida',
+        state: 'Uttar Pradesh',
+        pinCode: '201301',
+      });
+      await profile.save();
+      console.log('✅ NGO profile initialized');
+    } else {
+      profile.name = 'SAVITRAM FOUNDATION';
+      profile.contactNumber = '8860036008';
+      profile.address = 'A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida, Noida, Gautam Buddha Nagar - 201301, Uttar Pradesh';
+      profile.city = 'Noida';
+      profile.state = 'Uttar Pradesh';
+      profile.pinCode = '201301';
+      await profile.save();
+      console.log('✅ NGO profile contact information updated in database');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing/updating NGO profile:', error.message);
+  }
+};
+
 
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/admin', adminAuthRoutes);
@@ -273,6 +304,7 @@ const startServer = async () => {
     await connectDB();
     await initializeSuperAdmin();
     await initializeEvents();
+    await initializeNgoProfile();
     await ensureR2Cors();
 
     const server = app.listen(PORT, () => {

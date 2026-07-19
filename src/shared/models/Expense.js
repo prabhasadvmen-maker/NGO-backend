@@ -96,8 +96,9 @@ expenseSchema.pre('save', async function (next) {
         createdAt: { $gte: startOfYear, $lte: endOfYear }
       });
       
-      const sequence = String(count + 1).padStart(5, '0');
-      this.expenseId = `EXP-${year}-${sequence}`;
+      const sequence = String(count + 1).padStart(4, '0');
+      const random = Math.floor(100 + Math.random() * 900); // 3-digit random component to avoid collisions
+      this.expenseId = `EXP-${year}-${sequence}-${random}`;
     } catch (err) {
       return next(err);
     }

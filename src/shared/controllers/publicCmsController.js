@@ -169,7 +169,7 @@ export const chatbotReply = async (req, res) => {
 
     if (!process.env.GROQ_API_KEY) {
       console.error('GROQ_API_KEY not configured');
-      return res.status(503).json({ success: false, message: 'Chatbot service unavailable. Contact +91 83750 08009.' });
+      return res.status(503).json({ success: false, message: 'Chatbot service unavailable. Contact +91 88600 36008.' });
     }
 
     console.log('Groq API Key present:', process.env.GROQ_API_KEY.substring(0, 10) + '...');
@@ -184,7 +184,7 @@ export const chatbotReply = async (req, res) => {
       config = new CmsConfig();
       await config.save();
     }
-    const contactPhone = config.contactPhone || '+91 83750 08009';
+    const contactPhone = config.contactPhone || '+91 88600 36008';
     const contactEmail = config.contactEmail || 'hello@advmen.com';
 
     const SYSTEM_PROMPT = SYSTEM_PROMPT_TEMPLATE(contactPhone, contactEmail);

@@ -109,6 +109,10 @@ export async function ensureR2Cors() {
     await client.send(command);
     console.log('✅ R2 bucket CORS policy configured successfully');
   } catch (error) {
-    console.error('❌ Failed to configure R2 CORS policy:', error.message);
+    if (error.name === 'AccessDenied' || error.message.includes('Access Denied') || error.message.includes('AccessDenied')) {
+      console.log('ℹ️ R2 API key lacks permission to update CORS programmatically (Access Denied). This is typical for standard object-only tokens. Please configure CORS manually in the Cloudflare dashboard under Bucket > Settings > CORS.');
+    } else {
+      console.error('❌ Failed to configure R2 CORS policy:', error.message);
+    }
   }
 }
