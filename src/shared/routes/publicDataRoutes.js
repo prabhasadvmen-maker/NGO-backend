@@ -3,7 +3,8 @@ import {
   getPublicProjects,
   getPublicEvents,
   getPublicCampaigns,
-  getPublicStats
+  getPublicStats,
+  createPublicDonation
 } from '../controllers/publicDataController.js';
 import Branch from '../models/Branch.js';
 
@@ -12,6 +13,7 @@ router.get('/projects', getPublicProjects);
 router.get('/events', getPublicEvents);
 router.get('/campaigns', getPublicCampaigns);
 router.get('/stats', getPublicStats);
+router.post('/donate', createPublicDonation);
 router.get('/branches', async (req, res) => {
   try {
     const branches = await Branch.find({ isActive: true }, 'name city state').sort({ name: 1 });

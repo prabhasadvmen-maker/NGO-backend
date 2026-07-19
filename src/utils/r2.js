@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, PutBucketCorsCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 let r2Client = null;
@@ -78,4 +78,37 @@ export async function deleteObject(key) {
   const bucket = process.env.R2_BUCKET;
   const command = new DeleteObjectCommand({ Bucket: bucket, Key: key });
   await client.send(command);
+}
+
+/**
+ * Ensure CORS configuration is set on the R2 bucket
+ */
+export async function ensureR2Cors() {
+  try {
+    const client = getR2Client();
+    const bucket = process.env.R2_BUCKET;
+    if (!bucket) {
+      console.warn('⚠️ R2_BUCKET is not defined in environment variables.');
+      return;
+    }
+    console.log(`🔧 Configuring CORS policy for R2 bucket: ${bucket}...`);
+    const command = new PutBucketCorsCommand({
+      Bucket: bucket,
+      CORSConfiguration: {
+        CORSRules: [
+          {
+            AllowedHeaders: ['*'],
+            AllowedMethods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'],
+            AllowedOrigins: ['*'],
+            ExposeHeaders: ['ETag'],
+            MaxAgeSeconds: 3000
+          }
+        ]
+      }
+    });
+    await client.send(command);
+    console.log('✅ R2 bucket CORS policy configured successfully');
+  } catch (error) {
+    console.error('❌ Failed to configure R2 CORS policy:', error.message);
+  }
 }

@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import connectDB from './shared/config/database.js';
 import { validateEnv } from './shared/config/validation.js';
+import { ensureR2Cors } from './utils/r2.js';
 import authRoutes from './superadmin/routes/authRoutes.js';
 import adminAuthRoutes from './admin/routes/authRoutes.js';
 import adminRoutes from './superadmin/routes/adminRoutes.js';
@@ -48,6 +49,7 @@ import superadminCommunicationRoutes from './superadmin/routes/communicationRout
 import adminCommunicationRoutes from './admin/routes/communicationRoutes.js';
 import systemRoutes from './superadmin/routes/systemRoutes.js';
 import User from './shared/models/User.js';
+import Event from './shared/models/Event.js';
 
 dotenv.config();
 validateEnv();
@@ -58,9 +60,25 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://savitramfoundation.org',
+      'https://www.savitramfoundation.org',
+      'https://savitramfoundation.com',
+      'https://www.savitramfoundation.com',
+      process.env.CORS_ORIGIN
+    ].filter(Boolean);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
@@ -109,6 +127,67 @@ const initializeSuperAdmin = async () => {
     console.error('❌ Error initializing super admin:', error.message);
   }
 };
+
+const initializeEvents = async () => {
+  try {
+    const eventCount = await Event.countDocuments();
+    if (eventCount === 0) {
+      console.log('🌱 Seeding real database events...');
+      const superAdmin = await User.findOne({ role: 'super_admin' });
+      if (!superAdmin) {
+        console.warn('⚠️ Super Admin not found, cannot seed events.');
+        return;
+      }
+      
+      const realEvents = [
+        {
+          title: 'Savitram Free Health Checkup Drive',
+          description: 'A comprehensive free health diagnosis camp, specialist consultation, and essential medicine distribution drive for underserved communities.',
+          startDate: new Date(Date.now() + 3600000 * 24 * 7), // 7 days from now
+          endDate: new Date(Date.now() + 3600000 * 24 * 7 + 3600000 * 6), // + 6 hours
+          location: 'Community Center, Sector 8, Lucknow, UP',
+          type: 'Offline',
+          capacity: 300,
+          registrationsCount: 52,
+          status: 'Planned',
+          createdBy: superAdmin._id
+        },
+        {
+          title: 'Rural Girl Education & Scholarship Orientation',
+          description: 'Interactive session to enroll candidates and distribute learning kits for our annual secondary education scholarship campaign.',
+          startDate: new Date(Date.now() + 3600000 * 24 * 14), // 14 days from now
+          endDate: new Date(Date.now() + 3600000 * 24 * 14 + 3600000 * 4), // + 4 hours
+          location: 'Savitram Skill Hub, Delhi Okhla Center',
+          type: 'Offline',
+          capacity: 120,
+          registrationsCount: 88,
+          status: 'Planned',
+          createdBy: superAdmin._id
+        },
+        {
+          title: 'Village Clean Water Infrastructure Inspection',
+          description: 'An audit campaign and training workshop for local youth on testing ground water quality and maintaining solar water filtration plants.',
+          startDate: new Date(Date.now() + 3600000 * 24 * 3), // 3 days from now
+          endDate: new Date(Date.now() + 3600000 * 24 * 3 + 3600000 * 8), // + 8 hours
+          location: 'Panchayat Bhavan, Malihabad outskirts, UP',
+          type: 'Offline',
+          capacity: 80,
+          registrationsCount: 42,
+          status: 'Active',
+          createdBy: superAdmin._id
+        }
+      ];
+
+      await Event.insertMany(realEvents);
+      console.log('✅ Real database events seeded successfully!');
+    } else {
+      console.log('📊 Event database is already populated.');
+    }
+  } catch (error) {
+    console.error('❌ Error seeding database events:', error.message);
+  }
+};
+
 
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/admin', adminAuthRoutes);
@@ -193,7 +272,9 @@ const startServer = async () => {
   try {
     await connectDB();
     await initializeSuperAdmin();
-    
+    await initializeEvents();
+    await ensureR2Cors();
+
     const server = app.listen(PORT, () => {
       console.log(`\n🚀 Server running on http://localhost:${PORT}`);
       console.log(`📝 Environment: ${process.env.NODE_ENV}`);

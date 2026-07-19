@@ -1,4 +1,5 @@
 import Project from '../models/Project.js';
+import Donation from '../models/Donation.js';
 import Event from '../models/Event.js';
 import Campaign from '../models/Campaign.js';
 import Volunteer from '../models/Volunteer.js';
@@ -23,7 +24,7 @@ export const getPublicProjects = async (req, res) => {
 export const getPublicEvents = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
-    const events = await Event.find({ status: { $in: ['Active', 'Planned'] } })
+    const events = await Event.find({ status: { $in: ['Active', 'Planned', 'Completed'] } })
       .populate('branch', 'name')
       .sort({ startDate: 1 })
       .limit(limit);
@@ -74,3 +75,45 @@ export const getPublicStats = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch public stats' });
   }
 };
+
+export const createPublicDonation = async (req, res) => {
+  try {
+    const { donorName, donorEmail, donorPhone, amount, paymentMethod, purpose, campaign, branch, notes, transactionId } = req.body;
+
+    if (!donorName || !amount || !paymentMethod) {
+      return res.status(400).json({ success: false, message: 'Donor name, amount, and payment method are required' });
+    }
+
+    // Create donation record
+    const donation = new Donation({
+      donorName,
+      donorEmail: donorEmail || null,
+      donorPhone: donorPhone || null,
+      amount: Number(amount),
+      paymentMethod,
+      paymentStatus: 'completed', // For public online simulated checkout, mark as completed
+      transactionId: transactionId || 'TXN-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+      purpose: purpose || 'General',
+      campaign: campaign || null,
+      branch: branch || null,
+      notes: notes || 'Online Donation',
+      createdBy: null
+    });
+
+    await donation.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Donation successful. Thank you for your support!',
+      data: donation
+    });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ success: false, message: messages[0] });
+    }
+    console.error('Public donation creation error:', error);
+    res.status(500).json({ success: false, message: 'Failed to record donation' });
+  }
+};
+
