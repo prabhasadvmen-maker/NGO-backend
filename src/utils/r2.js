@@ -59,6 +59,14 @@ export async function getUploadPresignedUrl(key, contentType, expiresIn = 300) {
  */
 export async function getViewPresignedUrl(key, expiresIn = 3600) {
   if (!key) return null;
+
+  // If a public CDN/Custom domain URL is configured for the R2 bucket, return it directly.
+  // This avoids generating signatures in loops and enables permanent browser-caching of public images!
+  if (process.env.R2_PUBLIC_URL) {
+    const cleanUrl = process.env.R2_PUBLIC_URL.replace(/\/$/, '');
+    return `${cleanUrl}/${key}`;
+  }
+
   const client = getR2Client();
   const bucket = process.env.R2_BUCKET;
   const command = new GetObjectCommand({
