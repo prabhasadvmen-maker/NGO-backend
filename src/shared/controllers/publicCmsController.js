@@ -185,7 +185,7 @@ export const chatbotReply = async (req, res) => {
       await config.save();
     }
     const contactPhone = config.contactPhone || '+91 88600 36008';
-    const contactEmail = config.contactEmail || 'hello@advmen.com';
+    const contactEmail = config.contactEmail || 'Support.savitramfoundation@gmail.com';
 
     const SYSTEM_PROMPT = SYSTEM_PROMPT_TEMPLATE(contactPhone, contactEmail);
 

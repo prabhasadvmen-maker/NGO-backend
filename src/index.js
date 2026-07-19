@@ -197,7 +197,7 @@ const initializeNgoProfile = async () => {
       profile = new NgoProfile({
         name: 'SAVITRAM FOUNDATION',
         contactNumber: '8860036008',
-        email: 'info@savitramfoundation.org',
+        email: 'Support.savitramfoundation@gmail.com',
         address: 'A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida, Noida, Gautam Buddha Nagar - 201301, Uttar Pradesh',
         city: 'Noida',
         state: 'Uttar Pradesh',
@@ -208,6 +208,7 @@ const initializeNgoProfile = async () => {
     } else {
       profile.name = 'SAVITRAM FOUNDATION';
       profile.contactNumber = '8860036008';
+      profile.email = 'Support.savitramfoundation@gmail.com';
       profile.address = 'A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida, Noida, Gautam Buddha Nagar - 201301, Uttar Pradesh';
       profile.city = 'Noida';
       profile.state = 'Uttar Pradesh';

@@ -65,7 +65,7 @@ const cmsConfigSchema = new mongoose.Schema(
     },
     contactEmail: {
       type: String,
-      default: 'hello@advmen.com',
+      default: 'Support.savitramfoundation@gmail.com',
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
