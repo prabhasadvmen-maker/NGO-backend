@@ -142,7 +142,7 @@ export const sendAdminNewVolunteerNotification = async (volunteer, adminEmail) =
 
 export const sendFoodDonationWelcomeEmail = async (donation) => {
   const subject = `💚 Thank You for Your Food Donation! [ID: ${donation.donationId}]`;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
   const trackingUrl = `${clientUrl}/food-donation/track/${donation.donationId}`;
   
   const htmlContent = `
@@ -281,7 +281,7 @@ export const sendVolunteerAssignmentEmail = async (donation, volunteer) => {
   }
 
   const subject = `🚨 New Food Rescue Pickup Assignment! [ID: ${donation.donationId}]`;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
   const actionUrl = `${clientUrl}/volunteer/food-donation`;
   
   const htmlContent = `

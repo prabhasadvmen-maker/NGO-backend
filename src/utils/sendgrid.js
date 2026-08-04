@@ -12,7 +12,7 @@ export async function sendDonationReceivedEmail(donation) {
 
     // 2. Also log to communication inbox
     const subject = `AnnDan Food Donation Received [${donation.donationId}]`;
-    const trackingUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/food-donation/track/${donation.donationId}`;
+    const trackingUrl = `${process.env.CLIENT_URL || 'https://savitramfoundation.org'}/food-donation/track/${donation.donationId}`;
     
     const message = `
       Hello ${donation.donorName},
