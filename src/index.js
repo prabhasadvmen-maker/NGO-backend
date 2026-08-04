@@ -48,6 +48,12 @@ import adminMediaRoutes from './admin/routes/mediaRoutes.js';
 import superadminCommunicationRoutes from './superadmin/routes/communicationRoutes.js';
 import adminCommunicationRoutes from './admin/routes/communicationRoutes.js';
 import systemRoutes from './superadmin/routes/systemRoutes.js';
+import publicFoodDonationRoutes from './shared/routes/publicFoodDonationRoutes.js';
+import adminFoodDonationRoutes from './admin/routes/foodDonationRoutes.js';
+import volunteerFoodDonationRoutes from './volunteer/routes/foodDonationRoutes.js';
+import volunteerAuthRoutes from './volunteer/routes/authRoutes.js';
+import superadminFoodDonationRoutes from './superadmin/routes/foodDonationRoutes.js';
+import locationRoutes from './shared/routes/locationRoutes.js';
 import User from './shared/models/User.js';
 import Event from './shared/models/Event.js';
 import NgoProfile from './shared/models/NgoProfile.js';
@@ -56,7 +62,7 @@ dotenv.config();
 validateEnv();
 
 const app = express();
-app.set('trust proxy', 1); // Trust reverse proxy
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
 app.use(helmet());
@@ -145,8 +151,8 @@ const initializeEvents = async () => {
         {
           title: 'Savitram Free Health Checkup Drive',
           description: 'A comprehensive free health diagnosis camp, specialist consultation, and essential medicine distribution drive for underserved communities.',
-          startDate: new Date(Date.now() + 3600000 * 24 * 7), // 7 days from now
-          endDate: new Date(Date.now() + 3600000 * 24 * 7 + 3600000 * 6), // + 6 hours
+          startDate: new Date(Date.now() + 3600000 * 24 * 7),
+          endDate: new Date(Date.now() + 3600000 * 24 * 7 + 3600000 * 6),
           location: 'Community Center, Sector 8, Lucknow, UP',
           type: 'Offline',
           capacity: 300,
@@ -157,8 +163,8 @@ const initializeEvents = async () => {
         {
           title: 'Rural Girl Education & Scholarship Orientation',
           description: 'Interactive session to enroll candidates and distribute learning kits for our annual secondary education scholarship campaign.',
-          startDate: new Date(Date.now() + 3600000 * 24 * 14), // 14 days from now
-          endDate: new Date(Date.now() + 3600000 * 24 * 14 + 3600000 * 4), // + 4 hours
+          startDate: new Date(Date.now() + 3600000 * 24 * 14),
+          endDate: new Date(Date.now() + 3600000 * 24 * 14 + 3600000 * 4),
           location: 'Savitram Skill Hub, Delhi Okhla Center',
           type: 'Offline',
           capacity: 120,
@@ -169,8 +175,8 @@ const initializeEvents = async () => {
         {
           title: 'Village Clean Water Infrastructure Inspection',
           description: 'An audit campaign and training workshop for local youth on testing ground water quality and maintaining solar water filtration plants.',
-          startDate: new Date(Date.now() + 3600000 * 24 * 3), // 3 days from now
-          endDate: new Date(Date.now() + 3600000 * 24 * 3 + 3600000 * 8), // + 8 hours
+          startDate: new Date(Date.now() + 3600000 * 24 * 3),
+          endDate: new Date(Date.now() + 3600000 * 24 * 3 + 3600000 * 8),
           location: 'Panchayat Bhavan, Malihabad outskirts, UP',
           type: 'Offline',
           capacity: 80,
@@ -221,7 +227,6 @@ const initializeNgoProfile = async () => {
   }
 };
 
-
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admins', adminRoutes);
@@ -251,13 +256,21 @@ app.use('/api/superadmin/campaigns', superadminCampaignRoutes);
 app.use('/api/admin/campaigns', adminCampaignRoutes);
 app.use('/api/superadmin/certificates', superadminCertificateRoutes);
 app.use('/api/admin/certificates', adminCertificateRoutes);
+app.use('/api/public/food-donations', publicFoodDonationRoutes);
+app.use('/api/admin/food-donations', adminFoodDonationRoutes);
+app.use('/api/volunteer/auth', volunteerAuthRoutes);
+app.use('/api/volunteer/food-donations', volunteerFoodDonationRoutes);
+app.use('/api/superadmin/food-donations', superadminFoodDonationRoutes);
+app.use('/api/public/locations', locationRoutes);
+app.use('/api/admin/locations', locationRoutes);
+app.use('/api/superadmin/locations', locationRoutes);
+app.use('/api/public/cms', publicCmsRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/superadmin/expenses', superadminExpenseRoutes);
 app.use('/api/admin/expenses', adminExpenseRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/superadmin/cms', superadminCmsRoutes);
 app.use('/api/admin/cms', adminCmsRoutes);
-app.use('/api/public/cms', publicCmsRoutes);
 app.use('/api/public', publicDataRoutes);
 app.use('/api/superadmin/media', superadminMediaRoutes);
 app.use('/api/admin/media', adminMediaRoutes);

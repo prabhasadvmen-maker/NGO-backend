@@ -25,6 +25,10 @@ const volunteerSchema = new mongoose.Schema(
       sparse: true,
       match: [/^[6-9]\d{9}$/, 'Please provide a valid 10-digit Indian mobile number'],
     },
+    password: {
+      type: String,
+      default: null,
+    },
     email: {
       type: String,
       trim: true,
@@ -86,17 +90,36 @@ const volunteerSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Login tracking
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+    lastLoginIP: {
+      type: String,
+      default: null,
+    },
+    loginCount: {
+      type: Number,
+      default: 0,
+    },
     // Reference to NGO branch
     branch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Branch',
       required: [true, 'Branch assignment is required'],
     },
-    // Reference to creator
+    // Reference to creator (optional - null for self-registration, set when admin creates)
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      default: null,
+    },
+    // Track if volunteer self-registered or was created by admin
+    registrationType: {
+      type: String,
+      enum: ['self-registered', 'admin-created'],
+      default: 'self-registered',
     },
   },
   { timestamps: true }

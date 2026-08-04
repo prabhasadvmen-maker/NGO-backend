@@ -1,23 +1,386 @@
-﻿[
+[
   {
-    "id": "1783959463494",
+    "id": "1785864943127",
     "type": "Email",
-    "subject": "gfnthfgnhfgt",
-    "message": "ethrtgfnhrthfb",
-    "recipientType": "Volunteers",
+    "subject": "Impact Certificate: Your AnnDan Donation Nourished 25 People!",
+    "message": "\n    Dear Vijay singh,\n\n    We are thrilled to inform you that your food donation (ANN-2026-0003-126) has been successfully collected and distributed to beneficiaries!\n\n    🌟 Impact Summary:\n    - People Fed: 25\n    - Quantity Saved: 30\n    - Completed Date: 4/8/2026\n\n    Thank you for fighting hunger and reducing food waste with Savitram Foundation. You are a true hero!\n\n    With deep gratitude,\n    Savitram Foundation Board\n  ",
+    "recipientType": "Donor",
     "recipients": [
       {
-        "name": "Rahul Sharma",
-        "email": "prabhas.savitram@gmail.com",
-        "mobile": "9876543210"
-      },
+        "name": "Vijay singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "6386255549"
+      }
+    ],
+    "sentAt": "2026-08-04T17:35:43.127Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864914511",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0003-126]: Collected",
+    "message": "\n    Hello Vijay singh,\n\n    Your AnnDan food donation status has been updated to: COLLECTED.\n\n    Notes from our team: Volunteer has collected the food donation. En route for distribution!\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0003-126\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Vijay singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "6386255549"
+      }
+    ],
+    "sentAt": "2026-08-04T17:35:14.511Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864891383",
+    "type": "Email",
+    "subject": "New Food Donation Pickup Assignment [ANN-2026-0003-126]",
+    "message": "\n    Hello Anil kumar singh,\n\n    You have been assigned to collect an AnnDan food donation!\n\n    Pickup Details:\n    - Tracking ID: ANN-2026-0003-126\n    - Donor Name: Vijay singh\n    - Phone: 6386255549\n    - Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Time Window: Immediate (Within 1 Hour)\n    - Food Details: Cooked Food (30)\n\n    Please log in to your Volunteer Dashboard to accept the pickup and upload proof photos.\n\n    Savitram Foundation AnnDan Operations\n  ",
+    "recipientType": "Volunteer",
+    "recipients": [
       {
         "name": "Anil kumar singh",
-        "email": "prabhas.savitram@gmail.com",
+        "email": "anilkumarsingh43425@gmail.com",
         "mobile": "9918309983"
       }
     ],
-    "sentAt": "2026-07-13T16:17:43.495Z",
+    "sentAt": "2026-08-04T17:34:51.383Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864891345",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0003-126]: Assigned",
+    "message": "\n    Hello Vijay singh,\n\n    Your AnnDan food donation status has been updated to: ASSIGNED.\n\n    Notes from our team: Volunteer Anil kumar singh has been assigned for pickup. Contact: 9918309983\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0003-126\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Vijay singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "6386255549"
+      }
+    ],
+    "sentAt": "2026-08-04T17:34:51.346Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864881395",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0003-126]: Verified",
+    "message": "\n    Hello Vijay singh,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0003-126\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Vijay singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "6386255549"
+      }
+    ],
+    "sentAt": "2026-08-04T17:34:41.395Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864868003",
+    "type": "Email",
+    "subject": "AnnDan Food Donation Received [ANN-2026-0003-126]",
+    "message": "\n      Hello Vijay singh,\n\n      Thank you for offering your food donation with Savitram Foundation's AnnDan Initiative!\n\n      Donation Details:\n      - Tracking ID: ANN-2026-0003-126\n      - Food Type: Cooked Food\n      - Quantity: 30\n      - Pickup Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n      - Pickup Time Window: Immediate (Within 1 Hour)\n\n      Our team is verifying the donation details and matching a nearby volunteer for pickup.\n      Track your donation status live here: http://localhost:5173/food-donation/track/ANN-2026-0003-126\n\n      Warm regards,\n      Savitram Foundation AnnDan Team\n    ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Vijay singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "6386255549"
+      }
+    ],
+    "sentAt": "2026-08-04T17:34:28.003Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864310329",
+    "type": "Email",
+    "subject": "Impact Certificate: Your AnnDan Donation Nourished 40 People!",
+    "message": "\n    Dear Amit singh,\n\n    We are thrilled to inform you that your food donation (ANN-2026-0002-803) has been successfully collected and distributed to beneficiaries!\n\n    🌟 Impact Summary:\n    - People Fed: 40\n    - Quantity Saved: 30\n    - Completed Date: 4/8/2026\n\n    Thank you for fighting hunger and reducing food waste with Savitram Foundation. You are a true hero!\n\n    With deep gratitude,\n    Savitram Foundation Board\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Amit singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "8860030080"
+      }
+    ],
+    "sentAt": "2026-08-04T17:25:10.329Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864279639",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0002-803]: Collected",
+    "message": "\n    Hello Amit singh,\n\n    Your AnnDan food donation status has been updated to: COLLECTED.\n\n    Notes from our team: Volunteer has collected the food donation. En route for distribution!\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0002-803\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Amit singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "8860030080"
+      }
+    ],
+    "sentAt": "2026-08-04T17:24:39.639Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864240275",
+    "type": "Email",
+    "subject": "New Food Donation Pickup Assignment [ANN-2026-0002-803]",
+    "message": "\n    Hello Anil kumar singh,\n\n    You have been assigned to collect an AnnDan food donation!\n\n    Pickup Details:\n    - Tracking ID: ANN-2026-0002-803\n    - Donor Name: Amit singh\n    - Phone: 8860030080\n    - Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Time Window: Immediate (Within 1 Hour)\n    - Food Details: Cooked Food (30)\n\n    Please log in to your Volunteer Dashboard to accept the pickup and upload proof photos.\n\n    Savitram Foundation AnnDan Operations\n  ",
+    "recipientType": "Volunteer",
+    "recipients": [
+      {
+        "name": "Anil kumar singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "9918309983"
+      }
+    ],
+    "sentAt": "2026-08-04T17:24:00.275Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864240223",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0002-803]: Assigned",
+    "message": "\n    Hello Amit singh,\n\n    Your AnnDan food donation status has been updated to: ASSIGNED.\n\n    Notes from our team: Volunteer Anil kumar singh has been assigned for pickup. Contact: 9918309983\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0002-803\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Amit singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "8860030080"
+      }
+    ],
+    "sentAt": "2026-08-04T17:24:00.223Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785864231130",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0002-803]: Verified",
+    "message": "\n    Hello Amit singh,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0002-803\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Amit singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "8860030080"
+      }
+    ],
+    "sentAt": "2026-08-04T17:23:51.131Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785863875936",
+    "type": "Email",
+    "subject": "AnnDan Food Donation Received [ANN-2026-0002-803]",
+    "message": "\n    Hello Amit singh,\n\n    Thank you for offering your food donation with Savitram Foundation's AnnDan Initiative!\n\n    Donation Details:\n    - Tracking ID: ANN-2026-0002-803\n    - Food Type: Cooked Food\n    - Quantity: 30\n    - Pickup Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Pickup Time Window: Immediate (Within 1 Hour)\n\n    Our team is verifying the donation details and matching a nearby volunteer for pickup.\n    Track your donation status live here: https://savitramfoundation.org/food-donation/track/ANN-2026-0002-803\n\n    Warm regards,\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Amit singh",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "8860030080"
+      }
+    ],
+    "sentAt": "2026-08-04T17:17:55.937Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854230941",
+    "type": "Email",
+    "subject": "Impact Certificate: Your AnnDan Donation Nourished 90 People!",
+    "message": "\n    Dear Govind goyal,\n\n    We are thrilled to inform you that your food donation (ANN-2026-0001-415) has been successfully collected and distributed to beneficiaries!\n\n    🌟 Impact Summary:\n    - People Fed: 90\n    - Quantity Saved: 50\n    - Completed Date: 4/8/2026\n\n    Thank you for fighting hunger and reducing food waste with Savitram Foundation. You are a true hero!\n\n    With deep gratitude,\n    Savitram Foundation Board\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T14:37:10.941Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854186607",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-415]: Collected",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: COLLECTED.\n\n    Notes from our team: Volunteer has collected the food donation. En route for distribution!\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-415\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T14:36:26.607Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854125584",
+    "type": "Email",
+    "subject": "New Food Donation Pickup Assignment [ANN-2026-0001-415]",
+    "message": "\n    Hello Anil kumar singh,\n\n    You have been assigned to collect an AnnDan food donation!\n\n    Pickup Details:\n    - Tracking ID: ANN-2026-0001-415\n    - Donor Name: Govind goyal\n    - Phone: 886003008\n    - Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Time Window: Immediate (Within 1 Hour)\n    - Food Details: Raw Ingredients (50)\n\n    Please log in to your Volunteer Dashboard to accept the pickup and upload proof photos.\n\n    Savitram Foundation AnnDan Operations\n  ",
+    "recipientType": "Volunteer",
+    "recipients": [
+      {
+        "name": "Anil kumar singh",
+        "email": "anilkumarsingh43425@gmail.com",
+        "mobile": "9918309983"
+      }
+    ],
+    "sentAt": "2026-08-04T14:35:25.584Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854125543",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-415]: Assigned",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: ASSIGNED.\n\n    Notes from our team: Volunteer Anil kumar singh has been assigned for pickup. Contact: 9918309983\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-415\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T14:35:25.543Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854096582",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-415]: Verified",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-415\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T14:34:56.582Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785854070803",
+    "type": "Email",
+    "subject": "AnnDan Food Donation Received [ANN-2026-0001-415]",
+    "message": "\n    Hello Govind goyal,\n\n    Thank you for offering your food donation with Savitram Foundation's AnnDan Initiative!\n\n    Donation Details:\n    - Tracking ID: ANN-2026-0001-415\n    - Food Type: Raw Ingredients\n    - Quantity: 50\n    - Pickup Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Pickup Time Window: Immediate (Within 1 Hour)\n\n    Our team is verifying the donation details and matching a nearby volunteer for pickup.\n    Track your donation status live here: https://savitramfoundation.org/food-donation/track/ANN-2026-0001-415\n\n    Warm regards,\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T14:34:30.803Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831828139",
+    "type": "Email",
+    "subject": "New Food Donation Pickup Assignment [ANN-2026-0001-930]",
+    "message": "\n    Hello Rahul Sharma,\n\n    You have been assigned to collect an AnnDan food donation!\n\n    Pickup Details:\n    - Tracking ID: ANN-2026-0001-930\n    - Donor Name: Govind goyal\n    - Phone: 886003008\n    - Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Time Window: Immediate (Within 1 Hour)\n    - Food Details: Packaged Food (50)\n\n    Please log in to your Volunteer Dashboard to accept the pickup and upload proof photos.\n\n    Savitram Foundation AnnDan Operations\n  ",
+    "recipientType": "Volunteer",
+    "recipients": [
+      {
+        "name": "Rahul Sharma",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "9876543210"
+      }
+    ],
+    "sentAt": "2026-08-04T08:23:48.139Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831828117",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-930]: Assigned",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: ASSIGNED.\n\n    Notes from our team: Volunteer Rahul Sharma has been assigned for pickup. Contact: 9876543210\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-930\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T08:23:48.117Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831808720",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-930]: Verified",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-930\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T08:23:28.720Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831633650",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-930]: Verified",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-930\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T08:20:33.651Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831625448",
+    "type": "Email",
+    "subject": "Update on Food Donation [ANN-2026-0001-930]: Verified",
+    "message": "\n    Hello Govind goyal,\n\n    Your AnnDan food donation status has been updated to: VERIFIED.\n\n    Notes from our team: Your donation has been verified. We are dispatching a volunteer for pickup.\n\n    Track real-time updates and view collection/distribution photos here:\n    https://savitramfoundation.org/food-donation/track/ANN-2026-0001-930\n\n    Thank you for feeding lives!\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T08:20:25.448Z",
+    "status": "Sent"
+  },
+  {
+    "id": "1785831008915",
+    "type": "Email",
+    "subject": "AnnDan Food Donation Received [ANN-2026-0001-930]",
+    "message": "\n    Hello Govind goyal,\n\n    Thank you for offering your food donation with Savitram Foundation's AnnDan Initiative!\n\n    Donation Details:\n    - Tracking ID: ANN-2026-0001-930\n    - Food Type: Packaged Food\n    - Quantity: 50\n    - Pickup Address: A-13, GRAPHIX 2 SECTOR 62, UPPER GROUND FLOOR, Noida\n    - Pickup Time Window: Immediate (Within 1 Hour)\n\n    Our team is verifying the donation details and matching a nearby volunteer for pickup.\n    Track your donation status live here: https://savitramfoundation.org/food-donation/track/ANN-2026-0001-930\n\n    Warm regards,\n    Savitram Foundation AnnDan Team\n  ",
+    "recipientType": "Donor",
+    "recipients": [
+      {
+        "name": "Govind goyal",
+        "email": "prabhas.advmen@gmail.com",
+        "mobile": "886003008"
+      }
+    ],
+    "sentAt": "2026-08-04T08:10:08.915Z",
     "status": "Sent"
   }
 ]

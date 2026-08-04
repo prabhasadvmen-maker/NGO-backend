@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Volunteer from '../../shared/models/Volunteer.js';
 import Branch from '../../shared/models/Branch.js';
 import { getViewPresignedUrl, deleteObject, getUploadPresignedUrl } from '../../utils/r2.js';
+import { sendVolunteerApprovalEmail, sendVolunteerRejectionEmail } from '../../shared/services/emailService.js';
 
 // Sanitize body values to null for empty optional fields
 function sanitizeBody(body) {
@@ -47,8 +48,8 @@ export const getVolunteers = async (req, res) => {
     const { page = 1, limit = 10, search = '', status = '', availability = '', branch = '' } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Limit queries strictly to those registered by this Admin
-    const filter = { createdBy: req.user.id };
+    // Fetch volunteers (both self-registered and admin-created)
+    const filter = {};
     
     if (status) filter.status = status;
     if (availability) filter.availability = availability;
@@ -100,14 +101,13 @@ export const getVolunteers = async (req, res) => {
 // GET /api/admin/volunteers/stats
 export const getVolunteerStats = async (req, res) => {
   try {
-    const totalVolunteers = await Volunteer.countDocuments({ createdBy: req.user.id });
-    const activeVolunteers = await Volunteer.countDocuments({ createdBy: req.user.id, status: 'Active' });
-    const pendingVolunteers = await Volunteer.countDocuments({ createdBy: req.user.id, status: 'Pending' });
-    const inactiveVolunteers = await Volunteer.countDocuments({ createdBy: req.user.id, status: 'Inactive' });
+    const totalVolunteers = await Volunteer.countDocuments({});
+    const activeVolunteers = await Volunteer.countDocuments({ status: 'Active' });
+    const pendingVolunteers = await Volunteer.countDocuments({ status: 'Pending' });
+    const inactiveVolunteers = await Volunteer.countDocuments({ status: 'Inactive' });
 
-    // Aggregate skills represented among this admin's volunteers
+    // Aggregate skills represented among volunteers
     const skillsAggregation = await Volunteer.aggregate([
-      { $match: { createdBy: req.user.id } },
       { $unwind: '$skills' },
       { $group: { _id: '$skills', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -134,7 +134,7 @@ export const getVolunteerStats = async (req, res) => {
 // GET /api/admin/volunteers/:id
 export const getVolunteerById = async (req, res) => {
   try {
-    const volunteer = await Volunteer.findOne({ _id: req.params.id, createdBy: req.user.id })
+    const volunteer = await Volunteer.findById(req.params.id)
       .populate('branch', 'name code city state')
       .lean();
 
@@ -160,7 +160,7 @@ export const getVolunteerById = async (req, res) => {
 // POST /api/admin/volunteers
 export const createVolunteer = async (req, res) => {
   try {
-    const { fullName, mobileNumber, branch } = req.body;
+    const { fullName, mobileNumber, branch, password } = req.body;
 
     if (!fullName || !mobileNumber || !branch) {
       return res.status(400).json({ 
@@ -177,11 +177,14 @@ export const createVolunteer = async (req, res) => {
 
     const sanitized = sanitizeBody(req.body);
     const status = req.body.status || 'Pending';
+    const volunteerPassword = password || (mobileNumber.slice(-4) + 'Savitram');
 
     const volunteer = new Volunteer({
       ...sanitized,
+      password: volunteerPassword,
       status,
-      createdBy: req.user.id
+      createdBy: req.user.id,
+      registrationType: 'admin-created'
     });
 
     await volunteer.save();
@@ -217,7 +220,7 @@ export const updateVolunteer = async (req, res) => {
       }
     }
 
-    const volunteer = await Volunteer.findOne({ _id: req.params.id, createdBy: req.user.id });
+    const volunteer = await Volunteer.findById(req.params.id);
     if (!volunteer) {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
@@ -258,7 +261,7 @@ export const updateVolunteer = async (req, res) => {
 // DELETE /api/admin/volunteers/:id
 export const deleteVolunteer = async (req, res) => {
   try {
-    const volunteer = await Volunteer.findOneAndDelete({ _id: req.params.id, createdBy: req.user.id });
+    const volunteer = await Volunteer.findByIdAndDelete(req.params.id);
     if (!volunteer) {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
@@ -280,13 +283,15 @@ export const deleteVolunteer = async (req, res) => {
 // POST /api/admin/volunteers/:id/approve-request
 export const approveVolunteerRequest = async (req, res) => {
   try {
-    const volunteer = await Volunteer.findOne({ _id: req.params.id, createdBy: req.user.id });
+    const volunteer = await Volunteer.findById(req.params.id);
     if (!volunteer) {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
     volunteer.status = 'Active';
     await volunteer.save();
+
+    await sendVolunteerApprovalEmail(volunteer);
 
     res.json({ success: true, message: 'Volunteer verified & approved successfully' });
   } catch (error) {
@@ -298,13 +303,15 @@ export const approveVolunteerRequest = async (req, res) => {
 // POST /api/admin/volunteers/:id/reject-request
 export const rejectVolunteerRequest = async (req, res) => {
   try {
-    const volunteer = await Volunteer.findOne({ _id: req.params.id, createdBy: req.user.id });
+    const volunteer = await Volunteer.findById(req.params.id);
     if (!volunteer) {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
     volunteer.status = 'Inactive';
     await volunteer.save();
+
+    await sendVolunteerRejectionEmail(volunteer);
 
     res.json({ success: true, message: 'Volunteer application request rejected' });
   } catch (error) {

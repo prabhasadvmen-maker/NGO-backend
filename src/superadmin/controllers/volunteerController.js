@@ -159,7 +159,7 @@ export const getVolunteerById = async (req, res) => {
 // POST /api/superadmin/volunteers
 export const createVolunteer = async (req, res) => {
   try {
-    const { fullName, mobileNumber, branch } = req.body;
+    const { fullName, mobileNumber, branch, password } = req.body;
 
     if (!fullName || !mobileNumber || !branch) {
       return res.status(400).json({ 
@@ -175,9 +175,13 @@ export const createVolunteer = async (req, res) => {
     }
 
     const sanitized = sanitizeBody(req.body);
+    const volunteerPassword = password || (mobileNumber.slice(-4) + 'Savitram');
+
     const volunteer = new Volunteer({
       ...sanitized,
-      createdBy: req.user.id
+      password: volunteerPassword,
+      createdBy: req.user.id,
+      registrationType: 'admin-created'
     });
 
     await volunteer.save();
