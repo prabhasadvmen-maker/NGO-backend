@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import FoodDonation from '../../shared/models/FoodDonation.js';
 import DonationStatusHistory from '../../shared/models/DonationStatusHistory.js';
 import VolunteerAssignment from '../../shared/models/VolunteerAssignment.js';
@@ -270,18 +271,35 @@ export const distributeDonation = async (req, res) => {
  */
 export const getMyAssignments = async (req, res) => {
   try {
-    const volunteer = await Volunteer.findOne({
-      $or: [{ _id: req.user.id }, { createdBy: req.user.id }, { email: req.user.email }],
+    const userId = req.user?.id || req.user?._id;
+    const userEmail = req.user?.email;
+    const userMobile = req.user?.mobileNumber || req.user?.mobile;
+
+    // Find any matching Volunteer document by _id, createdBy, email, or mobile
+    const volunteerDocs = await Volunteer.find({
+      $or: [
+        ...(userId && mongoose.Types.ObjectId.isValid(userId) ? [{ _id: userId }, { createdBy: userId }] : []),
+        ...(userEmail ? [{ email: userEmail }] : []),
+        ...(userMobile ? [{ mobileNumber: userMobile }] : []),
+      ],
     });
+
+    const volunteerIds = volunteerDocs.map((v) => v._id);
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      volunteerIds.push(userId);
+    }
 
     const filter = {
       $or: [
-        { assignedVolunteerUser: req.user.id },
-        ...(volunteer ? [{ assignedVolunteer: volunteer._id }] : []),
+        { assignedVolunteer: { $in: volunteerIds } },
+        { assignedVolunteerUser: { $in: volunteerIds } },
       ],
     };
 
-    const donations = await FoodDonation.find(filter).sort({ updatedAt: -1 });
+    const donations = await FoodDonation.find(filter)
+      .populate('assignedVolunteer', 'fullName email mobileNumber')
+      .populate('assignedVolunteerUser', 'name email mobile')
+      .sort({ updatedAt: -1 });
 
     return res.status(200).json({
       success: true,
