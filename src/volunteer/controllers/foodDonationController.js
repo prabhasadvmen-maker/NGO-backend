@@ -12,9 +12,20 @@ import { sendDonationCompletionEmail } from '../../shared/services/emailService.
  */
 export const getAvailableDonations = async (req, res) => {
   try {
-    const { city } = req.query;
-    const filter = { status: { $in: ['Verified', 'Pending'] } };
+    const { city, priority, foodType, search } = req.query;
+    const filter = {
+      status: { $in: ['Verified', 'Pending', 'verified', 'pending'] },
+    };
     if (city) filter.city = new RegExp(city, 'i');
+    if (priority) filter.priority = new RegExp(priority, 'i');
+    if (foodType) filter.foodType = new RegExp(foodType, 'i');
+    if (search) {
+      filter.$or = [
+        { donorName: new RegExp(search, 'i') },
+        { pickupAddress: new RegExp(search, 'i') },
+        { _id: search.match(/^[a-f\d]{24}$/i) ? search : undefined },
+      ].filter((c) => Object.values(c)[0] !== undefined);
+    }
 
     const donations = await FoodDonation.find(filter).sort({ priority: -1, createdAt: -1 });
 
