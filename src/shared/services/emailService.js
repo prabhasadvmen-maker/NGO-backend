@@ -274,11 +274,86 @@ export const sendDonationCompletionEmail = async (donation) => {
   return sendEmail(donation.donorEmail, subject, htmlContent);
 };
 
+export const sendVolunteerAssignmentEmail = async (donation, volunteer) => {
+  if (!volunteer?.email) {
+    console.warn('⚠️ Volunteer has no email address configured:', volunteer?.fullName);
+    return false;
+  }
+
+  const subject = `🚨 New Food Rescue Pickup Assignment! [ID: ${donation.donationId}]`;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const actionUrl = `${clientUrl}/volunteer/food-donation`;
+  
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+      <div style="background-color: #1B5E20; color: white; padding: 24px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">🍲 Savitram Foundation</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">AnnDan Volunteer Rescue Operations</p>
+      </div>
+
+      <div style="padding: 24px; color: #1e293b;">
+        <h2 style="color: #1B5E20; margin-top: 0;">Hello ${volunteer.fullName || 'Volunteer'}!</h2>
+        <p style="font-size: 15px; line-height: 1.6; color: #334155;">
+          You have been assigned to collect a new food surplus donation! Please review the details below and log in to your Volunteer Portal to confirm pickup.
+        </p>
+
+        <div style="background-color: #f0fdf4; border-left: 4px solid #1B5E20; padding: 18px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin: 0 0 12px 0; color: #1B5E20; font-size: 16px;">📍 Pickup Details:</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Tracking ID:</td>
+              <td style="padding: 4px 0; color: #0f172a; font-weight: bold; text-align: right;">${donation.donationId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Donor Name:</td>
+              <td style="padding: 4px 0; color: #0f172a; font-weight: bold; text-align: right;">${donation.donorName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Donor Phone:</td>
+              <td style="padding: 4px 0; color: #1B5E20; font-weight: bold; text-align: right;">📞 ${donation.donorPhone}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Food Type:</td>
+              <td style="padding: 4px 0; color: #0f172a; text-align: right;">${donation.foodType}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Quantity:</td>
+              <td style="padding: 4px 0; color: #0f172a; text-align: right;">${donation.quantity} (~${donation.estimatedPeopleServed || 'N/A'} meals)</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Pickup Address:</td>
+              <td style="padding: 4px 0; color: #0f172a; text-align: right;">${donation.pickupAddress}, ${donation.city}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Time Window:</td>
+              <td style="padding: 4px 0; color: #dc2626; font-weight: bold; text-align: right;">${donation.pickupTimeWindow}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${actionUrl}" style="background-color: #1B5E20; color: white; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block;">
+            🚚 Open Volunteer Portal & Collect
+          </a>
+        </div>
+      </div>
+
+      <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+        <p style="margin: 0;">Savitram Foundation | AnnDan Volunteer Rescue Operations</p>
+        <p style="margin: 4px 0 0 0;">📞 +91 88600 36008 | 📧 info@savitramfoundation.org</p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail(volunteer.email, subject, htmlContent);
+};
+
 export default {
   sendVolunteerRegistrationEmail,
   sendVolunteerApprovalEmail,
   sendVolunteerRejectionEmail,
   sendAdminNewVolunteerNotification,
   sendFoodDonationWelcomeEmail,
+  sendVolunteerAssignmentEmail,
   sendDonationCompletionEmail,
 };

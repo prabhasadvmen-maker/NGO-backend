@@ -5,6 +5,7 @@ import VolunteerAssignment from '../../shared/models/VolunteerAssignment.js';
 import Volunteer from '../../shared/models/Volunteer.js';
 import { sendDonationStatusUpdateEmail, sendVolunteerAssignmentNotification } from '../../utils/sendgrid.js';
 import { getViewPresignedUrl } from '../../utils/r2.js';
+import { sendVolunteerAssignmentEmail } from '../../shared/services/emailService.js';
 
 /**
  * Get all Food Donations for Admin Dashboard
@@ -271,6 +272,9 @@ export const assignVolunteer = async (req, res) => {
     // Send notifications to donor and volunteer
     sendDonationStatusUpdateEmail(donation, 'Assigned', `Volunteer ${volunteer.fullName} has been assigned for pickup. Contact: ${volunteer.mobileNumber}`).catch(console.error);
     sendVolunteerAssignmentNotification(donation, volunteer).catch(console.error);
+    sendVolunteerAssignmentEmail(donation, volunteer).catch(err =>
+      console.error('Error sending volunteer assignment email via Brevo:', err)
+    );
 
     return res.status(200).json({
       success: true,
