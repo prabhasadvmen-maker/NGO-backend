@@ -348,6 +348,143 @@ export const sendVolunteerAssignmentEmail = async (donation, volunteer) => {
   return sendEmail(volunteer.email, subject, htmlContent);
 };
 
+export const sendCourseEnrollmentEmail = async (enrollment) => {
+  const subject = `🎓 Application Received: ${enrollment.courseTitle} | Savitram Foundation`;
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+      <div style="background-color: #1B5E20; color: white; padding: 24px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Savitram Foundation</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Free Skill Development & Vocational Training</p>
+      </div>
+      
+      <div style="padding: 30px; background-color: #ffffff;">
+        <h2 style="color: #0f172a; margin-top: 0;">Application Received, ${enrollment.studentName}!</h2>
+        <p style="color: #334155; line-height: 1.6; font-size: 15px;">
+          Thank you for applying for our free training course <strong>${enrollment.courseTitle}</strong>. Your application is under review by our NGO coordinators.
+        </p>
+
+        <div style="background-color: #f8fafc; border-left: 4px solid #1B5E20; padding: 18px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin: 0 0 12px 0; color: #1B5E20; font-size: 16px;">📋 Application Summary:</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Enrollment ID:</td>
+              <td style="padding: 4px 0; color: #1B5E20; font-weight: bold; text-align: right;">${enrollment.enrollmentId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Course Name:</td>
+              <td style="padding: 4px 0; color: #0f172a; font-weight: bold; text-align: right;">${enrollment.courseTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Applicant Phone:</td>
+              <td style="padding: 4px 0; color: #0f172a; text-align: right;">${enrollment.phone}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Status:</td>
+              <td style="padding: 4px 0; color: #d97706; font-weight: bold; text-align: right;">⏳ Pending Review</td>
+            </tr>
+          </table>
+        </div>
+
+        <p style="color: #475569; font-size: 14px; line-height: 1.5;">
+          Our coordinator team will verify your application and send an approval notification once your seat is confirmed.
+        </p>
+      </div>
+
+      <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+        <p style="margin: 0;">Savitram Foundation | Education & Empowerment</p>
+        <p style="margin: 4px 0 0 0;">📞 +91 88600 36008 | 📧 info@savitramfoundation.org</p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail(enrollment.email, subject, htmlContent);
+};
+
+export const sendCourseEnrollmentApprovalEmail = async (enrollment) => {
+  const subject = `🎉 Course Application Approved! - ${enrollment.courseTitle} | Savitram Foundation`;
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+      <div style="background-color: #1B5E20; color: white; padding: 24px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">🎉 Admission Approved!</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Savitram Foundation Education Portal</p>
+      </div>
+      
+      <div style="padding: 30px; background-color: #ffffff;">
+        <h2 style="color: #1B5E20; margin-top: 0;">Congratulations, ${enrollment.studentName}!</h2>
+        <p style="color: #334155; line-height: 1.6; font-size: 15px;">
+          Great news! Your application for the free course <strong>${enrollment.courseTitle}</strong> has been <strong>APPROVED</strong>.
+        </p>
+
+        <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 18px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin: 0 0 12px 0; color: #16a34a; font-size: 16px;">✅ Enrollment Details:</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Enrollment ID:</td>
+              <td style="padding: 4px 0; color: #1B5E20; font-weight: bold; text-align: right;">${enrollment.enrollmentId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Course Name:</td>
+              <td style="padding: 4px 0; color: #0f172a; font-weight: bold; text-align: right;">${enrollment.courseTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Fee:</td>
+              <td style="padding: 4px 0; color: #16a34a; font-weight: bold; text-align: right;">FREE (100% NGO Grant)</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; font-weight: bold;">Status:</td>
+              <td style="padding: 4px 0; color: #16a34a; font-weight: bold; text-align: right;">APPROVED ✅</td>
+            </tr>
+          </table>
+        </div>
+
+        <p style="color: #475569; font-size: 14px; line-height: 1.5;">
+          📞 Our batch coordinator will reach out to you on <strong>${enrollment.phone}</strong> for orientation details, timetable, and study material.
+        </p>
+      </div>
+
+      <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+        <p style="margin: 0;">Savitram Foundation | Empowering Youth Through Education</p>
+        <p style="margin: 4px 0 0 0;">📞 +91 88600 36008 | 📧 info@savitramfoundation.org</p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail(enrollment.email, subject, htmlContent);
+};
+
+export const sendCourseEnrollmentRejectionEmail = async (enrollment, reason) => {
+  const subject = `Update on Course Application - ${enrollment.courseTitle} | Savitram Foundation`;
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+      <div style="background-color: #0f172a; color: white; padding: 24px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Savitram Foundation</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Course Application Status Update</p>
+      </div>
+      
+      <div style="padding: 30px; background-color: #ffffff;">
+        <h2 style="color: #0f172a; margin-top: 0;">Hello, ${enrollment.studentName}</h2>
+        <p style="color: #334155; line-height: 1.6; font-size: 15px;">
+          Thank you for applying to <strong>${enrollment.courseTitle}</strong>. We regret to inform you that we are unable to approve your application for this batch at this time.
+        </p>
+
+        <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 14px; border-radius: 8px; margin: 20px 0; font-size: 14px; color: #991b1b;">
+          <strong>Reason:</strong> ${reason || 'Capacity full or criteria not met'}
+        </div>
+
+        <p style="color: #475569; font-size: 14px;">
+          You are welcome to explore and apply for our upcoming batches and other skill programs.
+        </p>
+      </div>
+
+      <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+        <p style="margin: 0;">Savitram Foundation</p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail(enrollment.email, subject, htmlContent);
+};
+
 export default {
   sendVolunteerRegistrationEmail,
   sendVolunteerApprovalEmail,
@@ -356,4 +493,7 @@ export default {
   sendFoodDonationWelcomeEmail,
   sendVolunteerAssignmentEmail,
   sendDonationCompletionEmail,
+  sendCourseEnrollmentEmail,
+  sendCourseEnrollmentApprovalEmail,
+  sendCourseEnrollmentRejectionEmail,
 };

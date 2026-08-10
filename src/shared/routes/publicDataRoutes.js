@@ -4,7 +4,10 @@ import {
   getPublicEvents,
   getPublicCampaigns,
   getPublicStats,
-  createPublicDonation
+  createPublicDonation,
+  getPublicCourses,
+  getPublicCourseById,
+  submitCourseEnrollment
 } from '../controllers/publicDataController.js';
 import Branch from '../models/Branch.js';
 
@@ -14,6 +17,10 @@ router.get('/events', getPublicEvents);
 router.get('/campaigns', getPublicCampaigns);
 router.get('/stats', getPublicStats);
 router.post('/donate', createPublicDonation);
+router.get('/courses', getPublicCourses);
+router.get('/courses/:id', getPublicCourseById);
+router.post('/courses/:courseId/enroll', submitCourseEnrollment);
+
 router.get('/branches', async (req, res) => {
   try {
     const branches = await Branch.find({ isActive: true }, 'name city state').sort({ name: 1 });

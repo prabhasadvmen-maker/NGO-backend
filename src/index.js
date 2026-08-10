@@ -54,9 +54,13 @@ import volunteerFoodDonationRoutes from './volunteer/routes/foodDonationRoutes.j
 import volunteerAuthRoutes from './volunteer/routes/authRoutes.js';
 import superadminFoodDonationRoutes from './superadmin/routes/foodDonationRoutes.js';
 import locationRoutes from './shared/routes/locationRoutes.js';
+import adminCourseRoutes from './admin/routes/courseRoutes.js';
 import User from './shared/models/User.js';
 import Event from './shared/models/Event.js';
 import NgoProfile from './shared/models/NgoProfile.js';
+import Course from './shared/models/Course.js';
+import CourseEnrollment from './shared/models/CourseEnrollment.js';
+import CourseCertificate from './shared/models/CourseCertificate.js';
 
 dotenv.config();
 validateEnv();
@@ -91,8 +95,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(morgan('combined'));
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -227,6 +231,168 @@ const initializeNgoProfile = async () => {
   }
 };
 
+const initializeCourses = async () => {
+  try {
+    const courseCount = await Course.countDocuments();
+    if (courseCount === 0) {
+      console.log('🌱 Seeding Savitram Foundation courses & enrollments...');
+      
+      const seedCourses = [
+        {
+          title: 'Basic Computer Literacy & Office Productivity',
+          description: 'A hands-on foundational course covering Windows OS, Microsoft Office suite, Internet navigation, and digital communication for job readiness.',
+          category: 'Computer Literacy',
+          instructor: 'Er. Rajesh Kumar',
+          duration: '2 Months',
+          totalLessons: 24,
+          mode: 'Offline',
+          language: 'Hindi',
+          totalSeats: 40,
+          enrolledCount: 28,
+          eligibility: 'Anyone',
+          ageMin: 14,
+          ageMax: 50,
+          startDate: new Date(),
+          level: 'Beginner',
+          status: 'Active',
+          syllabus: ['Module 1: Computer Fundamentals & OS', 'Module 2: MS Word & Excel Essentials', 'Module 3: Internet & Email Security'],
+        },
+        {
+          title: 'AI Tools & Prompt Engineering Workshop',
+          description: 'Practical training on leveraging generative AI tools like ChatGPT, Gemini, and Midjourney to enhance workplace productivity.',
+          category: 'Artificial Intelligence',
+          instructor: 'Dr. Prabhas Singh',
+          duration: '1 Month',
+          totalLessons: 12,
+          mode: 'Hybrid',
+          language: 'Hindi + English',
+          totalSeats: 50,
+          enrolledCount: 35,
+          eligibility: '12th Pass',
+          ageMin: 16,
+          ageMax: 45,
+          startDate: new Date(),
+          level: 'Intermediate',
+          status: 'Active',
+          syllabus: ['Module 1: Intro to Generative AI', 'Module 2: Advanced Prompting Techniques', 'Module 3: Content Creation & Automation'],
+        },
+        {
+          title: 'Apparel Tailoring & Craft Entrepreneurship',
+          description: 'Vocational training for women empowerment focusing on garment cutting, stitching techniques, quality control, and micro-business management.',
+          category: 'Tailoring & Crafts',
+          instructor: 'Smt. Sunita Devi',
+          duration: '3 Months',
+          totalLessons: 36,
+          mode: 'Offline',
+          language: 'Hindi',
+          totalSeats: 30,
+          enrolledCount: 22,
+          eligibility: 'Anyone',
+          ageMin: 18,
+          ageMax: 55,
+          startDate: new Date(),
+          level: 'Beginner',
+          status: 'Active',
+          syllabus: ['Module 1: Measurement & Pattern Drafting', 'Module 2: Stitching & Machine Maintenance', 'Module 3: Pricing & Local Market Sales'],
+        },
+        {
+          title: 'Spoken English & Corporate Soft Skills',
+          description: 'Interactive spoken English development, public speaking confidence, resume building, and interview preparation.',
+          category: 'Spoken English',
+          instructor: 'Anjali Sharma',
+          duration: '3 Months',
+          totalLessons: 30,
+          mode: 'Online',
+          language: 'English',
+          totalSeats: 60,
+          enrolledCount: 15,
+          eligibility: '10th Pass',
+          ageMin: 15,
+          ageMax: 40,
+          startDate: new Date(Date.now() + 86400000 * 10),
+          level: 'Beginner',
+          status: 'Upcoming',
+          syllabus: ['Module 1: Grammar & Vocabulary', 'Module 2: Conversation & Group Discussions', 'Module 3: Interview Mastery'],
+        }
+      ];
+
+      const insertedCourses = await Course.insertMany(seedCourses);
+      console.log('✅ Savitram Foundation courses seeded!');
+
+      // Seed enrollments
+      const seedEnrollments = [
+        {
+          enrollmentId: 'ENR-2025-00001',
+          course: insertedCourses[0]._id,
+          courseTitle: insertedCourses[0].title,
+          studentName: 'Amit Verma',
+          email: 'amit.verma@gmail.com',
+          phone: '9876543210',
+          whatsapp: '9876543210',
+          age: 21,
+          education: '12th Pass',
+          city: 'Lucknow',
+          state: 'Uttar Pradesh',
+          whyCourse: 'I want to learn basic computers to get a data entry job in my city.',
+          status: 'Pending',
+        },
+        {
+          enrollmentId: 'ENR-2025-00002',
+          course: insertedCourses[1]._id,
+          courseTitle: insertedCourses[1].title,
+          studentName: 'Priya Sharma',
+          email: 'priya.s@gmail.com',
+          phone: '9123456789',
+          whatsapp: '9123456789',
+          age: 23,
+          education: 'Graduate',
+          city: 'Noida',
+          state: 'Uttar Pradesh',
+          whyCourse: 'Want to upgrade my digital skills with AI prompt engineering.',
+          status: 'Approved',
+        },
+        {
+          enrollmentId: 'ENR-2025-00003',
+          course: insertedCourses[2]._id,
+          courseTitle: insertedCourses[2].title,
+          studentName: 'Suman Gupta',
+          email: 'suman.gupta@yahoo.com',
+          phone: '9988776655',
+          whatsapp: '9988776655',
+          age: 32,
+          education: '10th Pass',
+          city: 'Kanpur',
+          state: 'Uttar Pradesh',
+          whyCourse: 'Seeking self-employment through tailoring micro-enterprise.',
+          status: 'Completed',
+          certificateId: 'CERT-2025-00001',
+        }
+      ];
+
+      const insertedEnrollments = await CourseEnrollment.insertMany(seedEnrollments);
+
+      // Seed Certificate
+      const seedCertificate = new CourseCertificate({
+        certificateId: 'CERT-2025-00001',
+        enrollment: insertedEnrollments[2]._id,
+        studentName: 'Suman Gupta',
+        courseName: insertedCourses[2].title,
+        category: insertedCourses[2].category,
+        duration: insertedCourses[2].duration,
+        completionDate: new Date(),
+        grade: 'A+',
+        status: 'Verified',
+        instructorName: insertedCourses[2].instructor,
+      });
+
+      await seedCertificate.save();
+      console.log('✅ Savitram Foundation initial enrollments & certificates seeded!');
+    }
+  } catch (error) {
+    console.error('❌ Error seeding courses data:', error.message);
+  }
+};
+
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admins', adminRoutes);
@@ -264,6 +430,7 @@ app.use('/api/superadmin/food-donations', superadminFoodDonationRoutes);
 app.use('/api/public/locations', locationRoutes);
 app.use('/api/admin/locations', locationRoutes);
 app.use('/api/superadmin/locations', locationRoutes);
+app.use('/api/admin/courses', adminCourseRoutes);
 app.use('/api/public/cms', publicCmsRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/superadmin/expenses', superadminExpenseRoutes);
@@ -320,6 +487,7 @@ const startServer = async () => {
     await initializeSuperAdmin();
     await initializeEvents();
     await initializeNgoProfile();
+    await initializeCourses();
     await ensureR2Cors();
 
     const server = app.listen(PORT, () => {

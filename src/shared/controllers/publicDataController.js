@@ -6,6 +6,9 @@ import Volunteer from '../models/Volunteer.js';
 import Member from '../models/Member.js';
 import Branch from '../models/Branch.js';
 import CmsConfig from '../models/CmsConfig.js';
+import Course from '../models/Course.js';
+import CourseEnrollment from '../models/CourseEnrollment.js';
+import { sendCourseEnrollmentEmail } from '../services/emailService.js';
 
 export const getPublicProjects = async (req, res) => {
   try {
@@ -114,6 +117,82 @@ export const createPublicDonation = async (req, res) => {
     }
     console.error('Public donation creation error:', error);
     res.status(500).json({ success: false, message: 'Failed to record donation' });
+  }
+};
+
+export const getPublicCourses = async (req, res) => {
+  try {
+    const { category, mode, level } = req.query;
+    const query = { status: { $in: ['Active', 'Upcoming'] } };
+    if (category) query.category = category;
+    if (mode) query.mode = mode;
+    if (level) query.level = level;
+    const courses = await Course.find(query)
+      .select('title description category instructor duration totalLessons mode language thumbnailUrl introVideoUrl totalSeats enrolledCount eligibility ageMin ageMax startDate endDate level status syllabus')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: courses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch courses' });
+  }
+};
+
+export const getPublicCourseById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await Course.findById(id);
+    if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    res.json({ success: true, data: course });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch course details' });
+  }
+};
+
+export const submitCourseEnrollment = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { studentName, email, phone, whatsapp, age, education, city, state, whyCourse } = req.body;
+
+    if (!studentName || !email || !phone || !city) {
+      return res.status(400).json({ success: false, message: 'Name, email, phone and city are required' });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    if (course.status !== 'Active' && course.status !== 'Upcoming') {
+      return res.status(400).json({ success: false, message: 'Enrollments are not open for this course' });
+    }
+
+    const existing = await CourseEnrollment.findOne({ course: courseId, email: email.toLowerCase() });
+    if (existing) return res.status(400).json({ success: false, message: 'You have already applied for this course' });
+
+    const enrollment = new CourseEnrollment({
+      course: courseId,
+      courseTitle: course.title,
+      studentName, email, phone,
+      whatsapp: whatsapp || phone,
+      age: Number(age) || 18,
+      education: education || '12th Pass',
+      city, state: state || 'Uttar Pradesh',
+      whyCourse: whyCourse || '',
+      status: 'Pending',
+    });
+
+    await enrollment.save();
+
+    // Send confirmation email asynchronously (non-blocking)
+    try {
+      sendCourseEnrollmentEmail(enrollment);
+    } catch (emailErr) {
+      console.error('Failed to trigger application confirmation email:', emailErr);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Application submitted successfully! We will contact you soon.',
+      data: { enrollmentId: enrollment.enrollmentId }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to submit application' });
   }
 };
 
