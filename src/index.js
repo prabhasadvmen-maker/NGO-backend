@@ -81,7 +81,7 @@ const corsOptions = {
       'https://www.savitramfoundation.org',
       'https://savitramfoundation.com',
       'https://www.savitramfoundation.com',
-      process.env.CORS_ORIGIN
+      ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [])
     ].filter(Boolean);
 
     if (!origin || allowedOrigins.includes(origin)) {
