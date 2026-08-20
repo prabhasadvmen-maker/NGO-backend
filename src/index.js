@@ -55,6 +55,7 @@ import volunteerAuthRoutes from './volunteer/routes/authRoutes.js';
 import superadminFoodDonationRoutes from './superadmin/routes/foodDonationRoutes.js';
 import locationRoutes from './shared/routes/locationRoutes.js';
 import adminCourseRoutes from './admin/routes/courseRoutes.js';
+import paymentRoutes from './shared/routes/paymentRoutes.js';
 import User from './shared/models/User.js';
 import Event from './shared/models/Event.js';
 import NgoProfile from './shared/models/NgoProfile.js';
@@ -91,7 +92,9 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-rtb-fingerprint-id', 'request-id'],
+  exposedHeaders: ['x-rtb-fingerprint-id', 'request-id', 'Content-Type'],
+  maxAge: 86400,
 };
 app.use(cors(corsOptions));
 
@@ -447,6 +450,7 @@ app.use('/api/superadmin/system', systemRoutes);
 app.use('/api/member/auth', memberAuthRoutes);
 app.use('/api/member/membership', memberMembershipRoutes);
 app.use('/api/member/activities', memberActivityRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({
