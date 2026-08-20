@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
 import Donation from '../models/Donation.js';
+import { sendDonationReceipt, sendAdminNotification } from '../../utils/emailService.js';
 
 const getRazorpay = () => {
   return new Razorpay({
@@ -69,7 +70,7 @@ export const verifyPayment = async (req, res) => {
     let donation = await Donation.findOne({ transactionId: razorpay_payment_id });
     
     if (!donation) {
-      // Donation save karo
+      // Create new donation
       donation = new Donation({
         donorName: donorName || 'Anonymous',
         donorEmail: donorEmail || null,
@@ -83,6 +84,28 @@ export const verifyPayment = async (req, res) => {
       });
 
       await donation.save();
+      console.log(`✅ Donation saved: ${donation.receiptNumber}`);
+
+      // Send emails asynchronously (don't block response)
+      Promise.all([
+        sendDonationReceipt({
+          donorName: donation.donorName,
+          donorEmail: donation.donorEmail,
+          amount: donation.amount,
+          receiptNumber: donation.receiptNumber,
+          transactionId: donation.transactionId,
+          purpose: donation.purpose,
+          donationDate: donation.donationDate,
+        }),
+        sendAdminNotification({
+          donorName: donation.donorName,
+          donorEmail: donation.donorEmail,
+          amount: donation.amount,
+          receiptNumber: donation.receiptNumber,
+          transactionId: donation.transactionId,
+          purpose: donation.purpose,
+        }),
+      ]).catch(err => console.error('Email sending error:', err));
     }
 
     res.status(200).json({
@@ -90,6 +113,9 @@ export const verifyPayment = async (req, res) => {
       message: 'Payment successful',
       receiptNumber: donation.receiptNumber,
       transactionId: razorpay_payment_id,
+      donorName: donation.donorName,
+      amount: donation.amount,
+      donationDate: donation.donationDate,
     });
   } catch (error) {
     console.error('Payment verify error:', error);

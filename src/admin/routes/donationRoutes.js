@@ -7,26 +7,22 @@ import {
   createDonation,
   updateDonation,
   deleteDonation,
+  getOnlineDonations,
+  getOnlineDonationStats,
 } from '../controllers/donationController.js';
 
 const router = express.Router();
 
-// GET all donations recorded by current admin
+// Online/Razorpay donations routes (must be before /:id to avoid conflicts)
+router.get('/online/all', verifyToken, verifyAdmin, getOnlineDonations);
+router.get('/online/stats', verifyToken, verifyAdmin, getOnlineDonationStats);
+
+// Admin-recorded donations routes
 router.get('/', verifyToken, verifyAdmin, getAllDonations);
-
-// GET stats summary recorded by current admin
 router.get('/stats', verifyToken, verifyAdmin, getDonationStats);
-
-// GET detailed single donation recorded by current admin
 router.get('/:id', verifyToken, verifyAdmin, getDonationById);
-
-// POST record new donation
 router.post('/', verifyToken, verifyAdmin, createDonation);
-
-// PUT update donation details
 router.put('/:id', verifyToken, verifyAdmin, updateDonation);
-
-// DELETE remove donation record
 router.delete('/:id', verifyToken, verifyAdmin, deleteDonation);
 
 export default router;

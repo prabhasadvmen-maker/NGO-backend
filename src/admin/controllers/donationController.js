@@ -212,3 +212,96 @@ export const deleteDonation = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to delete donation' });
   }
 };
+
+// GET /api/admin/donations/online/all - All Razorpay/Online donations
+export const getOnlineDonations = async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      limit = 10, 
+      search = '', 
+      paymentStatus = '', 
+      purpose = '', 
+      startDate, 
+      endDate 
+    } = req.query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const filter = { paymentMethod: 'online' };
+
+    if (paymentStatus) filter.paymentStatus = paymentStatus;
+    if (purpose) filter.purpose = purpose;
+
+    if (search) {
+      filter.$or = [
+        { donorName: { $regex: search, $options: 'i' } },
+        { donorEmail: { $regex: search, $options: 'i' } },
+        { receiptNumber: { $regex: search, $options: 'i' } },
+        { transactionId: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (startDate || endDate) {
+      filter.donationDate = {};
+      if (startDate) filter.donationDate.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        filter.donationDate.$lte = end;
+      }
+    }
+
+    const [donations, total] = await Promise.all([
+      Donation.find(filter)
+        .populate('branch', 'name code')
+        .sort({ donationDate: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      Donation.countDocuments(filter),
+    ]);
+
+    res.json({
+      success: true,
+      data: donations,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    console.error('Admin get online donations error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch online donations' });
+  }
+};
+
+// GET /api/admin/donations/online/stats - Online donations stats
+export const getOnlineDonationStats = async (req, res) => {
+  try {
+    const filter = { paymentMethod: 'online' };
+    const totalCount = await Donation.countDocuments(filter);
+    const completedCount = await Donation.countDocuments({ ...filter, paymentStatus: 'completed' });
+    const pendingCount = await Donation.countDocuments({ ...filter, paymentStatus: 'pending' });
+
+    const amountStats = await Donation.aggregate([
+      { $match: { paymentMethod: 'online', paymentStatus: 'completed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const totalAmount = amountStats[0]?.total || 0;
+
+    res.json({
+      success: true,
+      data: {
+        totalCount,
+        completedCount,
+        pendingCount,
+        totalAmount,
+      }
+    });
+  } catch (error) {
+    console.error('Admin get online donation stats error:', error);
+    res.status(500).json({ success: false, message: 'Failed to compile stats' });
+  }
+};
