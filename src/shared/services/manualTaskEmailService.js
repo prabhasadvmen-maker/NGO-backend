@@ -51,7 +51,7 @@ export const sendTaskAssignmentEmail = async (task, volunteer) => {
 
   const subject = `🎯 New Task Assignment: ${task.title} [ID: ${task.taskId}]`;
   const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
-  const taskUrl = `${clientUrl}/volunteer/tasks/${task._id}`;
+  const taskUrl = `${clientUrl}/volunteer/food-donation/my-assignments`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
@@ -145,7 +145,7 @@ export const sendTaskCompletionConfirmationEmail = async (task, volunteer) => {
 
   const subject = `✅ Task Completion Submitted: ${task.title} [ID: ${task.taskId}]`;
   const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
-  const taskUrl = `${clientUrl}/volunteer/tasks/${task._id}`;
+  const taskUrl = `${clientUrl}/volunteer/food-donation/my-assignments`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
@@ -221,7 +221,7 @@ export const sendTaskCompletionConfirmationEmail = async (task, volunteer) => {
 export const sendTaskCompletionVerificationEmail = async (task, volunteer, adminEmail) => {
   const subject = `🔍 Task Completion Verification Required: ${task.title} [ID: ${task.taskId}]`;
   const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
-  const taskUrl = `${clientUrl}/admin/tasks/${task._id}`;
+  const taskUrl = `${clientUrl}/admin/volunteers/manual-tasks`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
@@ -326,7 +326,7 @@ export const sendTaskCompletionApprovalEmail = async (task, volunteer) => {
 
   const subject = `🎉 Task Completed & Verified: ${task.title} [ID: ${task.taskId}]`;
   const clientUrl = process.env.CLIENT_URL || 'https://savitramfoundation.org';
-  const dashboardUrl = `${clientUrl}/volunteer/dashboard`;
+  const dashboardUrl = `${clientUrl}/volunteer/food-donation/my-assignments`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
