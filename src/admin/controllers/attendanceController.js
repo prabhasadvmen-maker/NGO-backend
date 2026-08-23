@@ -25,8 +25,7 @@ export const getAttendanceSheet = async (req, res) => {
     // 1. Fetch all active volunteers registered by this admin in this branch
     const volunteers = await Volunteer.find({
       branch,
-      status: 'Active',
-      createdBy: req.user.id
+      status: 'Active'
     })
       .select('fullName volunteerId mobileNumber profilePhoto')
       .lean();
@@ -42,8 +41,7 @@ export const getAttendanceSheet = async (req, res) => {
     // 2. Fetch any marked attendance records on that date
     const attendanceRecords = await Attendance.find({
       branch,
-      date: targetDate,
-      createdBy: req.user.id
+      date: targetDate
     }).lean();
 
     // Create a lookup map of volunteerId -> attendance record
@@ -104,7 +102,7 @@ export const saveAttendance = async (req, res) => {
       const { volunteerId, status, remarks = '' } = rec;
       return {
         updateOne: {
-          filter: { volunteer: volunteerId, date: targetDate, createdBy: req.user.id },
+          filter: { volunteer: volunteerId, date: targetDate },
           update: { 
             $set: { 
               status, 
@@ -113,7 +111,8 @@ export const saveAttendance = async (req, res) => {
               updatedAt: new Date()
             },
             $setOnInsert: {
-              createdAt: new Date()
+              createdAt: new Date(),
+              createdBy: req.user.id
             }
           },
           upsert: true
@@ -142,7 +141,7 @@ export const getAttendanceHistory = async (req, res) => {
     const { page = 1, limit = 10, search = '', branch = '', startDate, endDate } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filter = { createdBy: req.user.id };
+    const filter = {};
 
     if (branch) filter.branch = branch;
 
@@ -155,8 +154,7 @@ export const getAttendanceHistory = async (req, res) => {
     // If search filter is active, fetch matching volunteer IDs first
     if (search) {
       const matchingVolunteers = await Volunteer.find({
-        fullName: { $regex: search, $options: 'i' },
-        createdBy: req.user.id
+        fullName: { $regex: search, $options: 'i' }
       }).select('_id');
       
       const volunteerIds = matchingVolunteers.map(v => v._id);
