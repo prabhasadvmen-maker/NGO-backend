@@ -10,6 +10,7 @@ import {
   updateManualTaskStatus,
   getVolunteerManualTasks,
   deleteManualTask,
+  verifyTaskCompletion,
 } from '../controllers/manualTaskController.js';
 
 const router = express.Router();
@@ -25,6 +26,9 @@ router.delete('/manual-tasks/:taskId', verifyToken, verifyAdmin, deleteManualTas
 
 // Status update - allowed for both admin and volunteers
 router.put('/manual-tasks/:taskId/status', verifyToken, updateManualTaskStatus);
+
+// Task completion verification - admin only
+router.post('/manual-tasks/:taskId/verify', verifyToken, verifyAdmin, verifyTaskCompletion);
 
 // Volunteer routes
 router.get('/volunteer/manual-tasks', verifyToken, getVolunteerManualTasks);

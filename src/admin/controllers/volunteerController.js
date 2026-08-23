@@ -296,7 +296,11 @@ export const approveVolunteerRequest = async (req, res) => {
     }
 
     console.log('✅ Approval email sent successfully to:', volunteer.email);
-    res.json({ success: true, message: 'Volunteer verified & approved successfully. Email sent!' });
+    res.json({ 
+      success: true, 
+      message: 'Volunteer verified & approved successfully. Email sent!',
+      data: volunteer
+    });
   } catch (error) {
     console.error('Approve volunteer error:', error);
     res.status(500).json({ success: false, message: 'Failed to approve volunteer' });
@@ -333,7 +337,11 @@ export const rejectVolunteerRequest = async (req, res) => {
     }
 
     console.log('✅ Rejection email sent successfully to:', volunteer.email);
-    res.json({ success: true, message: 'Volunteer application request rejected. Email sent!' });
+    res.json({ 
+      success: true, 
+      message: 'Volunteer application request rejected. Email sent!',
+      data: volunteer
+    });
   } catch (error) {
     console.error('Reject volunteer error:', error);
     res.status(500).json({ success: false, message: 'Failed to reject volunteer' });

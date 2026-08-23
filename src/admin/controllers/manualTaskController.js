@@ -1,6 +1,13 @@
 import ManualTask from '../../shared/models/ManualTask.js';
 import Volunteer from '../../shared/models/Volunteer.js';
+import User from '../../shared/models/User.js';
 import mongoose from 'mongoose';
+import {
+  sendTaskAssignmentEmail,
+  sendTaskCompletionConfirmationEmail,
+  sendTaskCompletionVerificationEmail,
+  sendTaskCompletionApprovalEmail,
+} from '../../shared/services/manualTaskEmailService.js';
 
 // GET all manual tasks (for admin)
 export const getAllManualTasks = async (req, res) => {
@@ -149,9 +156,17 @@ export const assignManualTask = async (req, res) => {
     task.status = 'Assigned';
     await task.save();
 
+    // Send assignment email to volunteer
+    const emailSent = await sendTaskAssignmentEmail(task, volunteer);
+    if (!emailSent) {
+      console.warn('⚠️ Task assignment email failed for volunteer:', volunteer._id);
+    } else {
+      console.log('✅ Task assignment email sent to:', volunteer.email);
+    }
+
     res.json({
       success: true,
-      message: 'Task assigned successfully',
+      message: 'Task assigned successfully' + (emailSent ? ' and email sent to volunteer' : ''),
       data: task,
     });
   } catch (error) {
@@ -225,10 +240,12 @@ export const updateManualTaskStatus = async (req, res) => {
     const { taskId } = req.params;
     const { status, completionNotes, proofPhotos, actualHours } = req.body;
 
-    const task = await ManualTask.findById(taskId);
+    const task = await ManualTask.findById(taskId).populate('assignedVolunteer');
     if (!task) {
       return res.status(404).json({ success: false, message: 'Task not found' });
     }
+
+    const previousStatus = task.status;
 
     if (status) task.status = status;
     if (completionNotes) task.completionNotes = completionNotes;
@@ -240,6 +257,22 @@ export const updateManualTaskStatus = async (req, res) => {
     }
 
     await task.save();
+
+    // Handle email notifications based on status change
+    if (status === 'In Progress' && previousStatus !== 'In Progress' && task.assignedVolunteer?.email) {
+      // Volunteer started the task - send confirmation
+      await sendTaskCompletionConfirmationEmail(task, task.assignedVolunteer);
+    } else if (status === 'Completed' && previousStatus !== 'Completed') {
+      // Task marked as completed by volunteer
+      if (task.assignedVolunteer?.email) {
+        await sendTaskCompletionConfirmationEmail(task, task.assignedVolunteer);
+      }
+      // Send verification email to admin
+      const adminUser = await User.findOne({ role: 'super_admin' });
+      if (adminUser?.email) {
+        await sendTaskCompletionVerificationEmail(task, task.assignedVolunteer, adminUser.email);
+      }
+    }
 
     res.json({
       success: true,
@@ -291,6 +324,50 @@ export const getVolunteerManualTasks = async (req, res) => {
   } catch (error) {
     console.error('Error fetching volunteer tasks:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch tasks' });
+  }
+};
+
+// VERIFY task completion (admin action)
+export const verifyTaskCompletion = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { approved, rejectionReason } = req.body;
+
+    const task = await ManualTask.findById(taskId).populate('assignedVolunteer');
+    if (!task) {
+      return res.status(404).json({ success: false, message: 'Task not found' });
+    }
+
+    if (approved) {
+      task.status = 'Completed';
+      task.completedAt = new Date();
+      await task.save();
+
+      // Send approval email to volunteer
+      if (task.assignedVolunteer?.email) {
+        await sendTaskCompletionApprovalEmail(task, task.assignedVolunteer);
+        console.log('✅ Task completion approval email sent to:', task.assignedVolunteer.email);
+      }
+
+      res.json({
+        success: true,
+        message: 'Task verified and marked as completed. Approval email sent to volunteer.',
+        data: task,
+      });
+    } else {
+      task.status = 'In Progress';
+      task.completionNotes = rejectionReason || task.completionNotes;
+      await task.save();
+
+      res.json({
+        success: true,
+        message: 'Task completion rejected. Volunteer notified to resubmit.',
+        data: task,
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying task completion:', error);
+    res.status(500).json({ success: false, message: 'Failed to verify task completion' });
   }
 };
 
