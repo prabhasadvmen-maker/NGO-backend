@@ -4,7 +4,6 @@ import Branch from '../../shared/models/Branch.js';
 import { getViewPresignedUrl, deleteObject, getUploadPresignedUrl } from '../../utils/r2.js';
 import { sendVolunteerApprovalEmail, sendVolunteerRejectionEmail } from '../../shared/services/emailService.js';
 
-// Sanitize body values to null for empty optional fields
 function sanitizeBody(body) {
   const optionalFields = [
     'email', 'gender', 'pinCode', 'dateOfBirth', 
@@ -21,7 +20,6 @@ function sanitizeBody(body) {
   return sanitized;
 }
 
-// GET /api/admin/volunteers/upload-url
 export const getUploadUrl = async (req, res) => {
   try {
     const { fileName, contentType } = req.query;
@@ -42,13 +40,11 @@ export const getUploadUrl = async (req, res) => {
   }
 };
 
-// GET /api/admin/volunteers
 export const getVolunteers = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = '', status = '', availability = '', branch = '' } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Fetch volunteers (both self-registered and admin-created)
     const filter = {};
     
     if (status) filter.status = status;
@@ -74,7 +70,6 @@ export const getVolunteers = async (req, res) => {
       Volunteer.countDocuments(filter),
     ]);
 
-    // Attach presigned view URLs for profile photos
     const volunteersWithUrls = await Promise.all(
       volunteers.map(async (v) => ({
         ...v,
@@ -98,7 +93,6 @@ export const getVolunteers = async (req, res) => {
   }
 };
 
-// GET /api/admin/volunteers/stats
 export const getVolunteerStats = async (req, res) => {
   try {
     const totalVolunteers = await Volunteer.countDocuments({});
@@ -106,7 +100,6 @@ export const getVolunteerStats = async (req, res) => {
     const pendingVolunteers = await Volunteer.countDocuments({ status: 'Pending' });
     const inactiveVolunteers = await Volunteer.countDocuments({ status: 'Inactive' });
 
-    // Aggregate skills represented among volunteers
     const skillsAggregation = await Volunteer.aggregate([
       { $unwind: '$skills' },
       { $group: { _id: '$skills', count: { $sum: 1 } } },
@@ -131,7 +124,6 @@ export const getVolunteerStats = async (req, res) => {
   }
 };
 
-// GET /api/admin/volunteers/:id
 export const getVolunteerById = async (req, res) => {
   try {
     const volunteer = await Volunteer.findById(req.params.id)
@@ -157,7 +149,6 @@ export const getVolunteerById = async (req, res) => {
   }
 };
 
-// POST /api/admin/volunteers
 export const createVolunteer = async (req, res) => {
   try {
     const { fullName, mobileNumber, branch, password } = req.body;
@@ -169,7 +160,6 @@ export const createVolunteer = async (req, res) => {
       });
     }
 
-    // Verify branch exists
     const branchExists = await Branch.findById(branch);
     if (!branchExists) {
       return res.status(400).json({ success: false, message: 'Assigned branch does not exist' });
@@ -207,12 +197,10 @@ export const createVolunteer = async (req, res) => {
   }
 };
 
-// PUT /api/admin/volunteers/:id
 export const updateVolunteer = async (req, res) => {
   try {
     const { branch } = req.body;
 
-    // Verify branch if changed
     if (branch) {
       const branchExists = await Branch.findById(branch);
       if (!branchExists) {
@@ -227,7 +215,6 @@ export const updateVolunteer = async (req, res) => {
 
     const sanitized = sanitizeBody(req.body);
 
-    // Clean up old photo if updated/removed
     if (sanitized.profilePhoto && sanitized.profilePhoto !== volunteer.profilePhoto && volunteer.profilePhoto) {
       await deleteObject(volunteer.profilePhoto).catch(() => {});
     }
@@ -258,7 +245,6 @@ export const updateVolunteer = async (req, res) => {
   }
 };
 
-// DELETE /api/admin/volunteers/:id
 export const deleteVolunteer = async (req, res) => {
   try {
     const volunteer = await Volunteer.findByIdAndDelete(req.params.id);
@@ -280,7 +266,6 @@ export const deleteVolunteer = async (req, res) => {
   }
 };
 
-// POST /api/admin/volunteers/:id/approve-request
 export const approveVolunteerRequest = async (req, res) => {
   try {
     const volunteer = await Volunteer.findById(req.params.id);
@@ -288,19 +273,36 @@ export const approveVolunteerRequest = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
+    if (!volunteer.email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Volunteer email is required to send approval notification. Please add email first.' 
+      });
+    }
+
     volunteer.status = 'Active';
     await volunteer.save();
 
-    await sendVolunteerApprovalEmail(volunteer);
+    console.log('📧 Sending approval email to:', volunteer.email);
+    const emailSent = await sendVolunteerApprovalEmail(volunteer);
+    
+    if (!emailSent) {
+      console.warn('⚠️ Email notification failed for volunteer:', volunteer._id, 'Email:', volunteer.email);
+      return res.json({ 
+        success: true, 
+        message: 'Volunteer approved but email notification failed. Check BREVO_API_KEY configuration.',
+        data: volunteer
+      });
+    }
 
-    res.json({ success: true, message: 'Volunteer verified & approved successfully' });
+    console.log('✅ Approval email sent successfully to:', volunteer.email);
+    res.json({ success: true, message: 'Volunteer verified & approved successfully. Email sent!' });
   } catch (error) {
     console.error('Approve volunteer error:', error);
     res.status(500).json({ success: false, message: 'Failed to approve volunteer' });
   }
 };
 
-// POST /api/admin/volunteers/:id/reject-request
 export const rejectVolunteerRequest = async (req, res) => {
   try {
     const volunteer = await Volunteer.findById(req.params.id);
@@ -308,12 +310,30 @@ export const rejectVolunteerRequest = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
+    if (!volunteer.email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Volunteer email is required to send rejection notification. Please add email first.' 
+      });
+    }
+
     volunteer.status = 'Inactive';
     await volunteer.save();
 
-    await sendVolunteerRejectionEmail(volunteer);
+    console.log('📧 Sending rejection email to:', volunteer.email);
+    const emailSent = await sendVolunteerRejectionEmail(volunteer);
+    
+    if (!emailSent) {
+      console.warn('⚠️ Email notification failed for volunteer:', volunteer._id, 'Email:', volunteer.email);
+      return res.json({ 
+        success: true, 
+        message: 'Volunteer rejected but email notification failed. Check BREVO_API_KEY configuration.',
+        data: volunteer
+      });
+    }
 
-    res.json({ success: true, message: 'Volunteer application request rejected' });
+    console.log('✅ Rejection email sent successfully to:', volunteer.email);
+    res.json({ success: true, message: 'Volunteer application request rejected. Email sent!' });
   } catch (error) {
     console.error('Reject volunteer error:', error);
     res.status(500).json({ success: false, message: 'Failed to reject volunteer' });
