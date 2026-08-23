@@ -168,7 +168,7 @@ export const volunteerLogin = async (req, res) => {
     const volunteer = await Volunteer.findOne({ email }).populate('branch', 'name code city');
 
     if (!volunteer) {
-      return res.status(401).json({
+      return res.status(200).json({
         success: false,
         message: 'Invalid email or password',
       });
@@ -179,7 +179,7 @@ export const volunteerLogin = async (req, res) => {
     const expectedPassword = storedPassword || (volunteer.mobileNumber.slice(-4) + 'Savitram');
     
     if (password !== expectedPassword) {
-      return res.status(401).json({
+      return res.status(200).json({
         success: false,
         message: 'Invalid email or password',
       });
@@ -193,7 +193,7 @@ export const volunteerLogin = async (req, res) => {
       } else if (volunteer.status === 'Inactive') {
         message = 'Your account has been deactivated. Please contact your branch admin.';
       }
-      return res.status(403).json({
+      return res.status(200).json({
         success: false,
         message,
       });
