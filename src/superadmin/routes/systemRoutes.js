@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -440,7 +440,7 @@ router.post('/ai', verifyToken, verifySuperAdmin, async (req, res) => {
     }
 
     const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama3-70b-8192',
       messages: [
         {
           role: 'system',

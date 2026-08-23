@@ -196,7 +196,7 @@ export const chatbotReply = async (req, res) => {
     ];
 
     console.log('Sending to Groq API:', { 
-      model: 'llama-3.3-70b-versatile', 
+      model: 'llama3-70b-8192', 
       messageCount: messages.length,
       userMessage: message.substring(0, 50) + '...'
     });
@@ -204,7 +204,7 @@ export const chatbotReply = async (req, res) => {
     let completion;
     try {
       completion = await groq.chat.completions.create({
-        model: 'groq/compound-mini',
+        model: 'llama3-70b-8192',
         messages,
         max_tokens: 200,
         temperature: 0.6
