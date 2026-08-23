@@ -204,7 +204,7 @@ export const chatbotReply = async (req, res) => {
     let completion;
     try {
       completion = await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model: 'groq/compound-mini',
         messages,
         max_tokens: 200,
         temperature: 0.6
