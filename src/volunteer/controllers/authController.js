@@ -123,10 +123,26 @@ export const volunteerSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in volunteer signup:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(error.errors).map(err => err.message).join(', ') || error.message,
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mobile number or email already registered',
+      });
+    }
+
     return res.status(500).json({
       success: false,
-      message: 'Signup failed. Please try again.',
+      message: 'Signup failed: ' + error.message,
       error: error.message,
+      stack: error.stack
     });
   }
 };
