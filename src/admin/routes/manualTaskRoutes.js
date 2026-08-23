@@ -21,8 +21,10 @@ router.post('/manual-tasks', verifyToken, verifyAdmin, createManualTask);
 router.put('/manual-tasks/:taskId', verifyToken, verifyAdmin, updateManualTask);
 router.post('/manual-tasks/assign', verifyToken, verifyAdmin, assignManualTask);
 router.post('/manual-tasks/unassign', verifyToken, verifyAdmin, unassignManualTask);
-router.put('/manual-tasks/:taskId/status', verifyToken, verifyAdmin, updateManualTaskStatus);
 router.delete('/manual-tasks/:taskId', verifyToken, verifyAdmin, deleteManualTask);
+
+// Status update - allowed for both admin and volunteers
+router.put('/manual-tasks/:taskId/status', verifyToken, updateManualTaskStatus);
 
 // Volunteer routes
 router.get('/volunteer/manual-tasks', verifyToken, getVolunteerManualTasks);

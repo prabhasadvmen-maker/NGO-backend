@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import Volunteer from '../../shared/models/Volunteer.js';
 import Branch from '../../shared/models/Branch.js';
 import { uploadToR2 } from '../../shared/utils/r2Upload.js';
+import { getViewPresignedUrl } from '../../utils/r2.js';
 import { sendVolunteerRegistrationEmail, sendAdminNewVolunteerNotification } from '../../shared/services/emailService.js';
 
 /**
@@ -119,6 +120,7 @@ export const volunteerSignup = async (req, res) => {
         city: newVolunteer.city,
         status: newVolunteer.status,
         profilePhoto: profilePhotoKey,
+        profilePhotoUrl: profilePhotoKey ? await getViewPresignedUrl(profilePhotoKey) : null,
       },
     });
   } catch (error) {
@@ -231,6 +233,7 @@ export const volunteerLogin = async (req, res) => {
         city: volunteer.city,
         branch: volunteer.branch,
         profilePhoto: volunteer.profilePhoto,
+        profilePhotoUrl: volunteer.profilePhoto ? await getViewPresignedUrl(volunteer.profilePhoto) : null,
       },
     });
   } catch (error) {
@@ -272,6 +275,7 @@ export const getVolunteerProfile = async (req, res) => {
         state: volunteer.state,
         branch: volunteer.branch,
         profilePhoto: volunteer.profilePhoto,
+        profilePhotoUrl: volunteer.profilePhoto ? await getViewPresignedUrl(volunteer.profilePhoto) : null,
         status: volunteer.status,
         availability: volunteer.availability,
         skills: volunteer.skills,
