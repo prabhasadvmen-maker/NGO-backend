@@ -154,6 +154,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+app.options('*', cors(corsOptions));
 app.use('/api/', limiter);
 
 const loginLimiter = rateLimit({
