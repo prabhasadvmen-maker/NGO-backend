@@ -1,3 +1,4 @@
+import cache from '../../utils/cache.js';
 import Project from '../models/Project.js';
 import Donation from '../models/Donation.js';
 import Event from '../models/Event.js';
@@ -8,6 +9,7 @@ import Branch from '../models/Branch.js';
 import CmsConfig from '../models/CmsConfig.js';
 import Course from '../models/Course.js';
 import CourseEnrollment from '../models/CourseEnrollment.js';
+import CourseCertificate from '../models/CourseCertificate.js';
 import { sendCourseEnrollmentEmail } from '../services/emailService.js';
 
 export const getPublicProjects = async (req, res) => {
@@ -54,25 +56,30 @@ export const getPublicCampaigns = async (req, res) => {
 
 export const getPublicStats = async (req, res) => {
   try {
-    const cms = await CmsConfig.findOne().lean();
-    
-    const volunteersCount = await Volunteer.countDocuments({ status: 'Active' });
-    const membersCount = await Member.countDocuments({ status: 'Active' });
-    const branchesCount = await Branch.countDocuments({ isActive: true });
-    const projectsCount = await Project.countDocuments({ status: 'Completed' });
-    
+    const cached = cache.get('public_stats');
+    if (cached) return res.json({ success: true, data: cached });
+
+    const [cms, volunteersCount, membersCount, branchesCount, projectsCount, certificatesCount] = await Promise.all([
+      CmsConfig.findOne().lean(),
+      Volunteer.countDocuments({ status: 'Active' }),
+      Member.countDocuments({ status: 'Active' }),
+      Branch.countDocuments({ isActive: true }),
+      Project.countDocuments({ status: 'Completed' }),
+      CourseCertificate.countDocuments({ status: 'Verified' })
+    ]);
+
     const livesImpacted = cms?.stats?.livesImpacted || 12500;
 
-    res.json({
-      success: true,
-      data: {
-        livesImpacted,
-        volunteersCount: volunteersCount || cms?.stats?.volunteersCount || 450,
-        projectsCount: projectsCount || cms?.stats?.projectsCompleted || 35,
-        branchesCount: branchesCount || 1,
-        membersCount: membersCount || 500
-      }
-    });
+    const data = {
+      livesImpacted,
+      volunteersCount: volunteersCount || cms?.stats?.volunteersCount || 0,
+      projectsCount: projectsCount || cms?.stats?.projectsCompleted || 0,
+      branchesCount: branchesCount || 1,
+      membersCount: membersCount || 0,
+      certificatesIssued: certificatesCount
+    };
+    cache.set('public_stats', data);
+    res.json({ success: true, data });
   } catch (error) {
     console.error('getPublicStats error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch public stats' });
@@ -123,13 +130,19 @@ export const createPublicDonation = async (req, res) => {
 export const getPublicCourses = async (req, res) => {
   try {
     const { category, mode, level } = req.query;
+    const cacheKey = `courses_${category || ''}_${mode || ''}_${level || ''}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json({ success: true, data: cached });
+
     const query = { status: { $in: ['Active', 'Upcoming'] } };
     if (category) query.category = category;
     if (mode) query.mode = mode;
     if (level) query.level = level;
     const courses = await Course.find(query)
       .select('title description category instructor duration totalLessons mode language thumbnailUrl introVideoUrl totalSeats enrolledCount eligibility ageMin ageMax startDate endDate level status syllabus')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+    cache.set(cacheKey, courses);
     res.json({ success: true, data: courses });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch courses' });
@@ -139,8 +152,13 @@ export const getPublicCourses = async (req, res) => {
 export const getPublicCourseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const course = await Course.findById(id);
+    const cacheKey = `course_${id}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json({ success: true, data: cached });
+
+    const course = await Course.findById(id).lean();
     if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+    cache.set(cacheKey, course);
     res.json({ success: true, data: course });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch course details' });

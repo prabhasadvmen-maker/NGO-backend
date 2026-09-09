@@ -122,5 +122,8 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+courseSchema.index({ status: 1 });
+courseSchema.index({ status: 1, category: 1, mode: 1, level: 1 });
+
 const Course = mongoose.model('Course', courseSchema);
 export default Course;

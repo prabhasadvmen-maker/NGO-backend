@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import connectDB from './shared/config/database.js';
@@ -141,11 +142,12 @@ const corsOptions = {
   exposedHeaders: ['x-rtb-fingerprint-id', 'request-id', 'Content-Type'],
   maxAge: 86400,
 };
+app.use(compression());
 app.use(cors(corsOptions));
 
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
-app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
 const isDev = process.env.NODE_ENV === 'development';
 const limiter = rateLimit({
