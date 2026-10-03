@@ -86,6 +86,7 @@ export const getPublicGallery = async (req, res) => {
       items.map(async (item) => {
         const obj = item.toObject();
         obj.imageUrlResolved = await resolveImageUrl(item.imageUrl);
+        obj.videoUrlResolved = await resolveImageUrl(item.videoUrl);
         return obj;
       })
     );

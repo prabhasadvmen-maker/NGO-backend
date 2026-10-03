@@ -264,6 +264,7 @@ export const getAllGalleryItems = async (req, res) => {
       items.map(async (item) => {
         const obj = item.toObject();
         obj.imageUrlResolved = await resolveImageUrl(item.imageUrl);
+        obj.videoUrlResolved = await resolveImageUrl(item.videoUrl);
         return obj;
       })
     );
@@ -285,13 +286,18 @@ export const getAllGalleryItems = async (req, res) => {
 
 export const createGalleryItem = async (req, res) => {
   try {
-    const { imageUrl, caption, category, branch } = req.body;
-    if (!imageUrl) {
+    const { imageUrl, videoUrl, mediaType, caption, category, branch } = req.body;
+    if (mediaType === 'video' && !videoUrl) {
+      return res.status(400).json({ success: false, message: 'Video URL is required for video type' });
+    }
+    if (mediaType !== 'video' && !imageUrl) {
       return res.status(400).json({ success: false, message: 'Image URL is required' });
     }
 
     const item = new GalleryItem({
-      imageUrl,
+      mediaType: mediaType || 'image',
+      imageUrl: imageUrl || '',
+      videoUrl: videoUrl || '',
       caption: caption || '',
       category: category || 'General',
       branch: branch || null,
@@ -308,10 +314,12 @@ export const createGalleryItem = async (req, res) => {
 export const updateGalleryItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { imageUrl, caption, category, branch } = req.body;
+    const { imageUrl, videoUrl, mediaType, caption, category, branch } = req.body;
     const item = await GalleryItem.findById(id);
     if (!item) return res.status(404).json({ success: false, message: 'Gallery item not found' });
+    if (mediaType !== undefined) item.mediaType = mediaType;
     if (imageUrl !== undefined) item.imageUrl = imageUrl;
+    if (videoUrl !== undefined) item.videoUrl = videoUrl;
     if (caption !== undefined) item.caption = caption;
     if (category !== undefined) item.category = category;
     if (branch !== undefined) item.branch = branch || null;
