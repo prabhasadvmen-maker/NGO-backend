@@ -8,9 +8,13 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'https://savitramfoundation.org
 const brevoClient = axios.create({
   baseURL: 'https://api.brevo.com/v3',
   headers: {
-    'api-key': BREVO_API_KEY,
     'Content-Type': 'application/json',
   },
+});
+
+brevoClient.interceptors.request.use((config) => {
+  config.headers['api-key'] = process.env.BREVO_API_KEY;
+  return config;
 });
 
 export const sendDonationReceipt = async (donationData) => {

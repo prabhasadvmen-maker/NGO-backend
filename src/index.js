@@ -126,6 +126,7 @@ const corsOptions = {
       'https://www.savitramfoundation.org',
       'https://savitramfoundation.com',
       'https://www.savitramfoundation.com',
+      'https://rp.bopple.me',
       ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [])
     ].filter(Boolean);
 
